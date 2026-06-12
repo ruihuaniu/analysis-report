@@ -410,7 +410,8 @@
     color: var(--ink);
     outline: none;
     width: 180px;
-    flex-shrink: 0;
+    max-width: 100%;
+    flex-shrink: 1;
   }
   .txn-search:focus { border-color: var(--ink3); background: #fff; }
 
@@ -553,7 +554,27 @@
     grid-template-columns: 400px 1fr;
   }
   @media (max-width: 720px) {
-    .merchant-body, .merchant-body.panel-open { grid-template-columns: 1fr; }
+    /* On mobile: always single column, panel stacks below table */
+    .merchant-body,
+    .merchant-body.panel-open {
+      grid-template-columns: 1fr;
+    }
+    /* Table column scrolls horizontally on its own */
+    .merchant-table-col {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Panel sits below table and scrolls horizontally too */
+    .merchant-txn-panel {
+      border-top: 1px solid var(--paper3) !important;
+      border-left: none !important;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Remove side border on table col when panel is open (border moves to top of panel) */
+    .merchant-body.panel-open .merchant-table-col {
+      border-right: none !important;
+    }
   }
   .merchant-table-col { overflow-y: auto; }
   .merchant-table-col .data-table { margin: 0; }
@@ -1009,24 +1030,65 @@
     justify-content: flex-end;
     margin-top: 20px;
   }
+
+  /* ── Import button hover ─────────────────────────────────── */
+  #btnOpenUpload:hover {
+    background: var(--paper3);
+    border-color: var(--ink3);
+    color: var(--ink);
+  }
+
+  /* ── Upload drop zone hover & drag-over ─────────────────── */
+  #uploadDropZone:hover,
+  #uploadDropZone.drag-over {
+    border-color: var(--blue);
+    background: var(--blue-l);
+  }
+
+  /* ── Upload popup processing state ─────────────────────── */
+  #uploadBanner.processing #uploadDropZone {
+    border-color: var(--teal);
+    background: var(--teal-l);
+    pointer-events: none;
+  }
+
+  @media (max-width: 500px) {
+    #btnOpenUpload span { display: none; }
+  }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- Upload Banner -->
-  <div class="upload-banner" id="uploadBanner">
-    <div class="upload-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="#8a8680" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="#8a8680" stroke-width="1.5"/></svg>
+  <!-- Upload popup modal -->
+  <div class="modal-backdrop" id="uploadPopupBackdrop">
+    <div class="modal" id="uploadBanner" style="max-width:480px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="upload-icon" style="background:var(--paper2);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="#8a8680" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="#8a8680" stroke-width="1.5"/></svg>
+          </div>
+          <div>
+            <div class="upload-title" style="font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px;">Import transaction data</div>
+            <div class="upload-sub" style="font-size:12px;color:var(--ink3);font-family:'DM Mono',monospace;">CSV or Excel (.xlsx / .xls)</div>
+          </div>
+        </div>
+        <button id="uploadPopupClose" style="background:none;border:none;cursor:pointer;color:var(--ink3);font-size:18px;padding:2px 4px;line-height:1;border-radius:4px;transition:color 0.12s;" title="Close">✕</button>
+      </div>
+
+      <!-- Drop zone -->
+      <div id="uploadDropZone" style="border:1.5px dashed var(--paper3);border-radius:10px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-bottom:16px;background:var(--paper);">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="margin-bottom:10px;opacity:0.4;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.5"/></svg>
+        <div style="font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:4px;">Drag &amp; drop your file here</div>
+        <div style="font-size:12px;color:var(--ink3);">or</div>
+        <button class="upload-btn" id="uploadBtn" style="margin-top:10px;font-size:13px;padding:8px 20px;">Browse file</button>
+      </div>
+
+      <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none">
+
+      <div class="upload-status" id="uploadStatus"></div>
+      <div class="upload-progress" id="uploadProgress" style="margin-top:8px;"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
     </div>
-    <div class="upload-info">
-      <div class="upload-title">Import your own transaction data</div>
-      <div class="upload-sub">Accepts CSV or Excel (.xlsx / .xls) · Drag &amp; drop or click to browse</div>
-    </div>
-    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none">
-    <button class="upload-btn" id="uploadBtn">Upload file</button>
-    <div class="upload-status" id="uploadStatus"></div>
-    <div class="upload-progress" id="uploadProgress"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
   </div>
 
   <!-- Column mapping modal -->
@@ -1043,13 +1105,45 @@
     </div>
   </div>
 
+  <!-- Upload screen (shown by default) -->
+  <div id="uploadScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;">
+    <div style="max-width:480px;width:100%;text-align:center;">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:20px;">Transaction Analysis</div>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,52px);line-height:1.08;font-weight:400;color:var(--ink);margin-bottom:16px;">Upload your<br><em style="font-style:italic;color:var(--blue);">bank statement</em></h1>
+      <p style="font-size:14px;color:var(--ink3);margin-bottom:36px;line-height:1.6;">Export a CSV from your bank's internet banking, then drop it here to generate your personal spending analysis.</p>
+      <label id="uploadZone" style="display:block;border:2px dashed var(--paper3);border-radius:12px;padding:40px 24px;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--paper2);">
+        <input type="file" id="csvFileInput" accept=".csv,.xlsx,.xls" style="display:none;">
+        <div style="font-size:36px;margin-bottom:12px;">📂</div>
+        <div style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px;">Drop CSV file here</div>
+        <div style="font-size:13px;color:var(--ink3);">or click to browse · CSV, XLS, XLSX</div>
+      </label>
+      <div id="uploadError" style="display:none;margin-top:16px;padding:12px 16px;background:var(--coral-l);border-radius:8px;font-size:13px;color:var(--coral);"></div>
+      <div id="uploadHint" style="margin-top:24px;font-size:12px;color:var(--ink3);line-height:1.6;">
+        Works with Westpac, ANZ, CommBank, NAB and most Australian bank CSV exports.<br>
+        Your data never leaves your device — everything runs in your browser.
+      </div>
+      <div id="clearStorageWrap" style="display:none;margin-top:20px;">
+        <button id="btnClearStorage" style="background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--ink3);cursor:pointer;">🗑 Clear saved data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard (hidden until CSV is uploaded) -->
+  <div id="dashboard" style="display:none;">
+
   <!-- Hero -->
   <header class="hero animate d1">
-    <div class="hero-badge" id="heroBadge">Transaction Analysis</div>
+    <div class="hero-badge">Statement Analysis</div>
     <h1>Transaction<br><em>Analysis</em> Report</h1>
-    <div class="hero-meta" id="heroMeta">
-      <span style="color:var(--ink3);font-style:italic">Upload a CSV file to generate your report</span>
+    <div class="hero-meta">
+      <span id="heroPeriod">Period: —</span>
+      <span id="heroGenerated">Generated: —</span>
+      <span id="heroSource">—</span>
     </div>
+    <button id="btnOpenUpload" title="Import your own data" aria-label="Import transaction data" style="position:absolute;top:52px;right:0;display:flex;align-items:center;gap:7px;background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:8px 14px;font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:500;color:var(--ink2);cursor:pointer;transition:background 0.15s,border-color 0.15s,color 0.15s;white-space:nowrap;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg>
+      Import data
+    </button>
     <div class="hero-accent"></div>
   </header>
 
@@ -1060,25 +1154,25 @@
       <h2 class="section-title">Summary</h2>
       <div class="section-divider"></div>
     </div>
-    <div class="metrics" id="metricsSection" style="display:none">
+    <div class="metrics">
       <div class="metric">
         <div class="metric-label">Total Spent</div>
-        <div class="metric-value" id="metricTotalSpent">—</div>
-        <div class="metric-sub" id="metricPeriod">—</div>
+        <div class="metric-value" id="metTotalSpend">—</div>
+        <div class="metric-sub" id="metPeriod">—</div>
       </div>
       <div class="metric">
         <div class="metric-label">Avg Monthly</div>
-        <div class="metric-value" id="metricAvgMonthly">—</div>
-        <div class="metric-sub" id="metricMonths">—</div>
+        <div class="metric-value" id="metAvgMonthly">—</div>
+        <div class="metric-sub" id="metMonths">—</div>
       </div>
       <div class="metric">
         <div class="metric-label">Total Credits</div>
-        <div class="metric-value" id="metricTotalCredits">—</div>
+        <div class="metric-value" id="metTotalCredit">—</div>
         <div class="metric-sub">payments + cashback</div>
       </div>
       <div class="metric">
         <div class="metric-label">Transactions</div>
-        <div class="metric-value" id="metricNumTxns">—</div>
+        <div class="metric-value" id="metTxnCount">—</div>
         <div class="metric-sub">debit transactions</div>
       </div>
     </div>
@@ -1094,8 +1188,8 @@
     <div class="chart-card" style="padding-bottom:0;overflow:hidden;">
       <div style="padding:0 0 16px;">
         <div class="chart-label">Withdrawals by month</div>
-        <div class="chart-title" id="monthlyChartTitle">Monthly spending overview</div>
-        <div class="chart-desc" id="monthlyChartDesc" style="margin-bottom:0">Upload a CSV to see your monthly spending breakdown.</div>
+        <div class="chart-title" id="monthlyChartTitle">Monthly spending</div>
+        <div class="chart-desc" id="monthlyChartDesc" style="margin-bottom:0"></div>
       </div>
       <div id="monthlyLegend" class="legend" style="margin-bottom:12px;"></div>
       <div style="position:relative;height:260px;">
@@ -1125,8 +1219,8 @@
 
     <div class="chart-card">
       <div class="chart-label">Trend</div>
-      <div class="chart-title" id="trendChartTitle">Spending trend</div>
-      <div class="chart-desc" id="trendChartDesc">Monthly spending trend across your data period.</div>
+      <div class="chart-title">Seasonal spending pattern</div>
+      <div class="chart-desc">Spending climbs from mid-2025 through a pronounced Oct–Dec 2025 holiday peak, dips in Jan and Mar 2026, then surges again in Feb 2026 (large bills). Spending normalises to ~$2,400–$3,400/month outside peak periods.</div>
       <div style="position:relative;height:160px;">
         <canvas id="trendChart" role="img" aria-label="Line chart of spending trend over 12 months"></canvas>
       </div>
@@ -1144,12 +1238,20 @@
     <!-- Donut chart row -->
     <div class="chart-card" style="margin-bottom:20px;">
       <div class="chart-label">Distribution</div>
-      <div class="chart-title" id="donutChartTitle">Spending by category</div>
+      <div class="chart-title" id="donutChartTitle">Top spending categories</div>
       <div class="donut-row">
         <div class="donut-canvas-wrap">
           <canvas id="donutChart" role="img" aria-label="Donut chart of spending categories"></canvas>
         </div>
-        <div class="donut-legend" id="donutLegend"></div>
+        <div class="donut-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#0e7a5a"></span>Groceries &amp; supermarkets</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#1e5fa8"></span>Dining &amp; takeaway</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#b85c00"></span>Hardware &amp; home</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#b5365a"></span>Utilities &amp; bills</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#5138a8"></span>Fuel</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#7a9e1a"></span>Travel &amp; accommodation</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#c44020"></span>Other</div>
+        </div>
       </div>
     </div>
 
@@ -1240,7 +1342,7 @@
         <canvas id="merchantChart" role="img" aria-label="Horizontal bar chart of top merchants by spend"></canvas>
       </div>
     </div>
-    <div class="chart-card" style="margin-top:0;padding:0;overflow:hidden;">
+    <div class="chart-card" style="margin-top:0;padding:0;overflow:visible;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;">
         <div>
           <div class="chart-label">Merchant detail</div>
@@ -1302,52 +1404,106 @@
   </section>
 
   <!-- 5. Observations -->
-  <section class="section animate d6" id="observationsSection" style="display:none">
+  <section class="section animate d6">
     <div class="section-header">
       <span class="section-num">05</span>
       <h2 class="section-title">Key Observations</h2>
       <div class="section-divider"></div>
     </div>
     <div class="obs-grid" id="obsGrid">
-      <!-- dynamically populated -->
+      <!-- populated dynamically after CSV upload -->
     </div>
   </section>
 
   <!-- 6. Recommendations -->
-  <section class="section" id="recommendationsSection" style="display:none">
+  <section class="section">
     <div class="section-header">
       <span class="section-num">06</span>
       <h2 class="section-title">Areas to Review</h2>
       <div class="section-divider"></div>
     </div>
     <div class="rec-list" id="recList">
-      <!-- dynamically populated -->
+      <!-- populated dynamically after CSV upload -->
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="footer" id="reportFooter" style="display:none">
-    <p id="footerLeft">Transaction Analysis Report</p>
+  <footer class="footer">
+    <p id="footerLine1">Statement Analysis</p>
     <p>Categories assigned by keyword matching · Not financial advice</p>
   </footer>
 
-</div>
+</div><!-- end #dashboard -->
 
 <script>
-// ── Global data (populated by CSV upload) ─────────────────────────
-var TOTAL_SPEND = 0;
-var TOTAL_CREDIT = 0;
-var NUM_TXNS = 0;
+// ── Data — populated by CSV upload ──────────────────────────────────
+let TOTAL_SPEND = 0;
+let TOTAL_CREDIT = 0;
+let NUM_TXNS = 0;
 var MONTHS = [];
 var SPEND = [];
 var CATS = [];
 var MERCHANTS = [];
 var ALL_TXN = [];
+window.ALL_TXN = ALL_TXN;
+window.CATS = CATS;
+window.MONTHS = MONTHS;
+window.SPEND = SPEND;
+
+// ── rebuildDashboard: called after legacy rebuildReport completes ──
+function rebuildDashboard(months, spend, cats, merchants, txns, totalSpend, totalCredit, filename) {
+  TOTAL_SPEND = totalSpend;
+  TOTAL_CREDIT = totalCredit;
+  NUM_TXNS = txns.length;
+  updateMetrics();
+}
+
+// ── localStorage restore ──────────────────────────────────────────
+(function restoreFromStorage() {
+  try {
+    const raw = localStorage.getItem('txr_txns');
+    if (!raw) return;
+    const saved = localStorage.getItem('txr_saved');
+    const txns = JSON.parse(raw);
+    if (!Array.isArray(txns) || !txns.length) return;
+
+    // Reconstruct Date objects expected by rebuildReport
+    const MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const hydrated = txns.map(t => {
+      const p = t.d.split(' ');
+      return { ...t, date: new Date(+p[2], MONS.indexOf(p[1]), +p[0]) };
+    });
+
+    // Show dashboard immediately, hide upload screen
+    const us = document.getElementById('uploadScreen');
+    const db = document.getElementById('dashboard');
+    if (us) us.style.display = 'none';
+    if (db) db.style.display = 'block';
+
+    // Show a restore notice on the hero
+    const heroSrc = document.getElementById('heroSource');
+    if (heroSrc && saved) {
+      const ago = new Date(+saved);
+      heroSrc.textContent = 'Restored · ' + txns.length + ' transactions · saved '
+        + ago.toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    // Run the full rebuild pipeline (charts, tables, metrics, observations)
+    // Use setTimeout to allow all scripts/IIFEs to finish initialising first
+    setTimeout(() => {
+      if (typeof window._rebuildReport === 'function') window._rebuildReport(hydrated);
+    }, 0);
+
+  } catch(e) {
+    console.warn('localStorage restore failed:', e.message);
+  }
+})();
+
 
 // ── Category table → collapsible side panel (with sorting) ─────────
 const GRID_COLOR = '#ede9e0';
 const TICK_COLOR = '#8a8680';
-const catTotal      = CATS.reduce((a,c) => a+c.val, 0);
+const catTotal      = CATS.length ? CATS.reduce((a,c) => a+c.val, 0) : 0;
 const catBody       = document.getElementById('catTableBody');
 const catFoot       = document.getElementById('catTableFoot');
 const panelEmpty    = document.getElementById('txnPanelEmpty');
@@ -1380,7 +1536,7 @@ footTr.innerHTML = `
   </td>
   <td style="text-align:right;font-family:'DM Mono',monospace">100%</td>
   <td></td>`;
-catFoot.appendChild(footTr);
+if (catFoot) catFoot.appendChild(footTr);
 
 // ── Collapse panel ───────────────────────────────────────────────
 function collapsePanel() {
@@ -1592,111 +1748,134 @@ if (initSortBtn) {
 
 
 // ── Summary metric cards ─────────────────────────────────────────
-// Metrics are hidden until CSV uploaded — populated by upload handler
+function updateMetrics() {
+  const totalSpend  = window.TOTAL_SPEND  || 0;
+  const totalCredit = window.TOTAL_CREDIT || 0;
+  const numTxns     = window.NUM_TXNS     || 0;
+  const allTxn      = window.ALL_TXN      || [];
+  const spend       = window.SPEND        || [];
 
-// ── Monthly bar chart ─────────────────────────────────────────────
-// ── Stacked monthly chart by category ─────────────────────────────
+  const months = spend.filter(v => v > 100).length || 1;
+  const MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fmtD(d){ return MONS[d.getMonth()] + ' ' + d.getFullYear(); }
+  const dates = allTxn.map(t => { const p = t.d.split(' '); return new Date(+p[2], MONS.indexOf(p[1]), +p[0]); });
+  const minD = dates.length ? new Date(Math.min(...dates)) : null;
+  const maxD = dates.length ? new Date(Math.max(...dates)) : null;
+  const periodStr = (minD && maxD) ? fmtD(minD) + ' \u2013 ' + fmtD(maxD) : '\u2014';
+
+  const el = id => document.getElementById(id);
+  if (el('metTotalSpend'))  el('metTotalSpend').textContent  = '$' + totalSpend.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  if (el('metAvgMonthly'))  el('metAvgMonthly').textContent  = '$' + Math.round(totalSpend / months).toLocaleString();
+  if (el('metTotalCredit')) el('metTotalCredit').textContent = '$' + totalCredit.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  if (el('metTxnCount'))    el('metTxnCount').textContent    = numTxns.toLocaleString();
+  if (el('metPeriod'))      el('metPeriod').textContent      = periodStr;
+  if (el('metMonths'))      el('metMonths').textContent      = 'across ' + months + ' months';
+  if (el('heroPeriod'))     el('heroPeriod').textContent     = 'Period: ' + periodStr;
+  const now = new Date();
+  if (el('heroGenerated'))  el('heroGenerated').textContent  = 'Generated: ' + now.getDate() + ' ' + MONS[now.getMonth()] + ' ' + now.getFullYear();
+  if (el('footerLine1'))    el('footerLine1').textContent    = 'Statement Analysis \u00b7 ' + periodStr + ' \u00b7 ' + numTxns + ' transactions';
+
+  // Update dynamic chart titles
+  const wSpend = window.SPEND || [];
+  if (maxD && minD && wSpend.length) {
+    const peakIdx = wSpend.indexOf(Math.max(...wSpend));
+    const peakMon = (window.MONTHS || [])[peakIdx] || '';
+    if (el('monthlyChartTitle')) el('monthlyChartTitle').textContent = peakMon ? peakMon + ' was the peak spending month' : 'Monthly spending';
+    if (el('monthlyChartDesc'))  el('monthlyChartDesc').textContent  = '';
+  }
+  if (window.CATS && window.CATS.length) {
+    const top2 = window.CATS.slice(0,2).map(c => c.name.split(' ')[0]).join(' & ');
+    if (el('donutChartTitle')) el('donutChartTitle').textContent = top2 + ' dominate spend';
+  }
+  if (window.MERCHANTS && window.MERCHANTS.length) {
+    if (el('merchantChartTitle')) el('merchantChartTitle').textContent = 'Top merchants by spend';
+  }
+}
+
+// ── Upload screen wiring ─────────────────────────────────────────
 (function() {
-  // Build per-month per-category totals from ALL_TXN
-  const catOrder = CATS.map(c => c.name);
-  const monthlyByCat = {};
-  catOrder.forEach(cat => {
-    monthlyByCat[cat] = MONTHS.map(() => 0);
+  const uploadScreen = document.getElementById('uploadScreen');
+  const dashboard    = document.getElementById('dashboard');
+  const zone         = document.getElementById('uploadZone');
+  const fileInput    = document.getElementById('csvFileInput');
+  const errorDiv     = document.getElementById('uploadError');
+  const openBtn      = document.getElementById('btnOpenUpload');
+
+  function showError(msg) {
+    errorDiv.textContent = msg;
+    errorDiv.style.display = 'block';
+  }
+  function clearError() { errorDiv.style.display = 'none'; }
+
+  // Drag-and-drop styling
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--blue)'; zone.style.background = 'var(--blue-l)'; });
+  zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; zone.style.background = ''; });
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.style.borderColor = ''; zone.style.background = '';
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
   });
-  window.ALL_TXN.forEach(t => {
-    const mi = MONTHS.indexOf(parseMonthKey(t.d));
-    if (mi === -1) return;
-    if (monthlyByCat[t.cat]) monthlyByCat[t.cat][mi] += t.amt;
-    else {
-      // fallback: put in Other
-      if (monthlyByCat['Other']) monthlyByCat['Other'][mi] += t.amt;
-    }
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+  if (openBtn) openBtn.addEventListener('click', () => {
+    dashboard.style.display = 'none';
+    uploadScreen.style.display = 'flex';
+    clearError();
+    // Show clear button if saved data exists
+    try {
+      const cw = document.getElementById('clearStorageWrap');
+      if (cw) cw.style.display = localStorage.getItem('txr_txns') ? 'block' : 'none';
+    } catch(e) {}
   });
 
-  function parseMonthKey(dateStr) {
-    // dateStr like "3 Feb 2026" → "Feb 26"
-    const parts = dateStr.split(' ');
-    const mon = parts[1];
-    const yr = parts[2].slice(2);
-    return mon + ' ' + yr;
+  function handleFile(file) {
+    clearError();
+    // Switch to dashboard so the column-mapping modal can appear over it
+    uploadScreen.style.display = 'none';
+    dashboard.style.display = 'block';
+    // Delegate entirely to the proven legacy pipeline
+    if (typeof window._legacyHandleFile === 'function') {
+      window._legacyHandleFile(file);
+    }
   }
 
-  // Build legend
-  const legendEl = document.getElementById('monthlyLegend');
-  catOrder.forEach(cat => {
-    const color = (CATS.find(c => c.name === cat) || {}).color || '#888';
-    const total = monthlyByCat[cat].reduce((s,v)=>s+v,0);
-    if (total < 1) return;
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.innerHTML = '<span class="legend-dot" style="background:' + color + ';width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0"></span>' + cat;
-    legendEl.appendChild(item);
+  // ── Show clear button if saved data exists ────────────────────
+  const clearWrap = document.getElementById('clearStorageWrap');
+  const btnClear  = document.getElementById('btnClearStorage');
+  try {
+    if (localStorage.getItem('txr_txns') && clearWrap) clearWrap.style.display = 'block';
+  } catch(e) {}
+
+  if (btnClear) btnClear.addEventListener('click', () => {
+    try {
+      localStorage.removeItem('txr_txns');
+      localStorage.removeItem('txr_saved');
+    } catch(e) {}
+    if (clearWrap) clearWrap.style.display = 'none';
+    zone.querySelector('div:nth-child(2)').textContent = 'Drop CSV file here';
+    clearError();
+    document.getElementById('uploadError') && (document.getElementById('uploadError').style.display = 'none');
   });
+})();
 
-  const datasets = catOrder
-    .filter(cat => monthlyByCat[cat].reduce((s,v)=>s+v,0) >= 1)
-    .map(cat => {
-      const color = (CATS.find(c => c.name === cat) || {}).color || '#888';
-      return {
-        label: cat,
-        data: monthlyByCat[cat].map(v => Math.round(v * 100) / 100),
-        backgroundColor: color,
-        borderColor: 'transparent',
-        borderWidth: 0,
-        stack: 'monthly'
-      };
-    });
+// ── Monthly bar chart + detail panel ──────────────────────────────
+(function() {
 
-  const monthlyChart = new Chart(document.getElementById('monthlyChart'), {
-    type: 'bar',
-    data: { labels: MONTHS, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          mode: 'index',
-          callbacks: {
-            title: items => items[0].label,
-            label: c => {
-              const v = c.parsed.y;
-              if (!v || v < 0.01) return null;
-              return '  ' + c.dataset.label + ': $' + v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-            },
-            footer: items => {
-              const total = items.reduce((s,i) => s + (i.parsed.y||0), 0);
-              return 'Total: $' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-            }
-          }
-        }
-      },
-      scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: TICK_COLOR } },
-        y: { stacked: true, grid: { color: GRID_COLOR }, border: { display: false },
-             ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k', font: { size: 11 }, color: TICK_COLOR } }
-      },
-      onClick(e, elements) {
-        if (!elements.length) return;
-        const mi = elements[0].index;
-        openMonthPanel(MONTHS[mi], mi);
-      },
-      onHover(e, elements) {
-        e.native.target.style.cursor = elements.length ? 'pointer' : 'default';
-      }
-    }
-  });
+  function parseMonthKey(dateStr) {
+    const parts = dateStr.split(' ');
+    return parts[1] + ' ' + parts[2].slice(2); // "3 Feb 2026" → "Feb 26"
+  }
 
-  // ── Month detail panel ────────────────────────────────
-  const monthlyPanel   = document.getElementById('monthlyPanel');
-  const monthlyPanelTitle = document.getElementById('monthlyPanelTitle');
-  const monthlyPanelStats = document.getElementById('monthlyPanelStats');
-  const monthlyPanelList  = document.getElementById('monthlyPanelList');
-  const monthlyPanelCount = document.getElementById('monthlyPanelCount');
-  const monthlyPanelSearch= document.getElementById('monthlyPanelSearch');
-  const btnMonthlyCollapse= document.getElementById('btnMonthlyCollapse');
+  // ── Month detail panel (always wired, regardless of data) ─────────
+  const monthlyPanel        = document.getElementById('monthlyPanel');
+  const monthlyPanelTitle   = document.getElementById('monthlyPanelTitle');
+  const monthlyPanelStats   = document.getElementById('monthlyPanelStats');
+  const monthlyPanelList    = document.getElementById('monthlyPanelList');
+  const monthlyPanelCount   = document.getElementById('monthlyPanelCount');
+  const monthlyPanelSearch  = document.getElementById('monthlyPanelSearch');
+  const btnMonthlyCollapse  = document.getElementById('btnMonthlyCollapse');
   let activeMonthKey = null;
-  let monthSort = 'date';
+  let monthSort  = 'date';
   let monthSearch = '';
 
   const mmMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1705,20 +1884,25 @@ if (initSortBtn) {
     return new Date(+p[2], mmMonths.indexOf(p[1]), +p[0]);
   }
 
-  function openMonthPanel(monthKey, mi) {
+  function openMonthPanel(monthKey) {
     activeMonthKey = monthKey;
-    monthSort = 'date';
+    monthSort  = 'date';
     monthSearch = '';
-    monthlyPanelSearch.value = '';
+    if (monthlyPanelSearch) monthlyPanelSearch.value = '';
     document.querySelectorAll('[data-mmsort]').forEach(b => b.classList.toggle('active', b.dataset.mmsort === 'date'));
     renderMonthPanel();
-    monthlyPanel.style.display = 'block';
-    monthlyPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (monthlyPanel) {
+      monthlyPanel.style.display = 'block';
+      monthlyPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
+  // Expose globally — called by the rebuilt chart onClick after CSV upload
+  window._openMonthPanel = openMonthPanel;
 
   function renderMonthPanel() {
-    const key = activeMonthKey; // e.g. "Feb 26"
-    let txns = window.ALL_TXN.filter(t => parseMonthKey(t.d) === key);
+    if (!activeMonthKey) return;
+    const key = activeMonthKey;
+    let txns = (window.ALL_TXN || []).filter(t => parseMonthKey(t.d) === key);
     if (monthSearch) {
       const sv = monthSearch.toLowerCase();
       txns = txns.filter(t => t.desc.toLowerCase().includes(sv) || t.cat.toLowerCase().includes(sv) || String(t.amt).includes(sv));
@@ -1728,35 +1912,35 @@ if (initSortBtn) {
     if (monthSort === 'desc') sorted.sort((a,b) => b.amt - a.amt);
     if (monthSort === 'date') sorted.sort((a,b) => parseDateObj(b.d) - parseDateObj(a.d));
 
-    const total = txns.reduce((s,t)=>s+t.amt,0);
-    // Expand the month key to full name
+    const total = txns.reduce((s,t) => s + t.amt, 0);
     const [mon, yr] = key.split(' ');
     const fullMons = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',
                       Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-    monthlyPanelTitle.textContent = (fullMons[mon]||mon) + ' 20' + yr;
-    monthlyPanelStats.textContent = txns.length + ' transaction' + (txns.length !== 1 ? 's' : '') + '  ·  $' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    if (monthlyPanelTitle) monthlyPanelTitle.textContent = (fullMons[mon]||mon) + ' 20' + yr;
+    if (monthlyPanelStats) monthlyPanelStats.textContent = txns.length + ' transaction' + (txns.length !== 1 ? 's' : '') + '  ·  $' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 
     const catColor = {};
-    CATS.forEach(c => catColor[c.name] = c.color);
+    (window.CATS || []).forEach(c => { catColor[c.name] = c.color; });
 
-    monthlyPanelList.innerHTML = sorted.map(t => {
-      const dot = '<span style="width:8px;height:8px;border-radius:50%;background:' + (catColor[t.cat]||'#aaa') + ';display:inline-block;flex-shrink:0;margin-right:6px;"></span>';
-      return '<div class="txn-item">'
-        + '<span class="txn-date">' + t.d + '</span>'
-        + '<span class="txn-desc" style="display:flex;align-items:center;">' + dot + t.desc + '</span>'
-        + '<span class="txn-amt">$' + t.amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span>'
-        + '</div>';
-    }).join('');
-    monthlyPanelCount.textContent = monthSearch
+    if (monthlyPanelList) {
+      monthlyPanelList.innerHTML = sorted.map(t => {
+        const dot = '<span style="width:8px;height:8px;border-radius:50%;background:' + (catColor[t.cat]||'#aaa') + ';display:inline-block;flex-shrink:0;margin-right:6px;"></span>';
+        return '<div class="txn-item">'
+          + '<span class="txn-date">' + t.d + '</span>'
+          + '<span class="txn-desc" style="display:flex;align-items:center;">' + dot + t.desc + '</span>'
+          + '<span class="txn-amt">$' + t.amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span>'
+          + '</div>';
+      }).join('');
+    }
+    if (monthlyPanelCount) monthlyPanelCount.textContent = monthSearch
       ? 'Showing ' + sorted.length + ' of ' + txns.length + ' transactions'
       : 'Showing all ' + txns.length + ' transactions';
   }
 
-  btnMonthlyCollapse.addEventListener('click', () => {
-    monthlyPanel.style.display = 'none';
+  if (btnMonthlyCollapse) btnMonthlyCollapse.addEventListener('click', () => {
+    if (monthlyPanel) monthlyPanel.style.display = 'none';
     activeMonthKey = null;
   });
-
   document.querySelectorAll('[data-mmsort]').forEach(btn => {
     btn.addEventListener('click', () => {
       monthSort = btn.dataset.mmsort;
@@ -1765,47 +1949,148 @@ if (initSortBtn) {
       if (activeMonthKey) renderMonthPanel();
     });
   });
-
-  monthlyPanelSearch.addEventListener('input', () => {
+  if (monthlyPanelSearch) monthlyPanelSearch.addEventListener('input', () => {
     monthSearch = monthlyPanelSearch.value.trim();
     if (activeMonthKey) renderMonthPanel();
+  });
+
+  // ── Initial chart build (skipped if no data yet) ──────────────────
+  if (!CATS.length || !MONTHS.length) return;
+
+  const catOrder = CATS.map(c => c.name);
+  const monthlyByCat = {};
+  catOrder.forEach(cat => { monthlyByCat[cat] = MONTHS.map(() => 0); });
+  window.ALL_TXN.forEach(t => {
+    const mi = MONTHS.indexOf(parseMonthKey(t.d));
+    if (mi === -1) return;
+    if (monthlyByCat[t.cat]) monthlyByCat[t.cat][mi] += t.amt;
+    else if (monthlyByCat['Other']) monthlyByCat['Other'][mi] += t.amt;
+  });
+
+  const legendEl = document.getElementById('monthlyLegend');
+  catOrder.forEach(cat => {
+    const color = (CATS.find(c => c.name === cat) || {}).color || '#888';
+    const total = monthlyByCat[cat].reduce((s,v)=>s+v,0);
+    if (total < 1) return;
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = '<span class="legend-dot" style="background:' + color + ';width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0"></span>' + cat;
+    if (legendEl) legendEl.appendChild(item);
+  });
+
+  const datasets = catOrder
+    .filter(cat => monthlyByCat[cat].reduce((s,v)=>s+v,0) >= 1)
+    .map(cat => ({
+      label: cat,
+      data: monthlyByCat[cat].map(v => Math.round(v*100)/100),
+      backgroundColor: (CATS.find(c => c.name === cat)||{}).color || '#888',
+      borderWidth: 0,
+      stack: 'monthly'
+    }));
+
+  new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: { labels: MONTHS, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index',
+          callbacks: {
+            title: items => items[0].label,
+            label: c => { const v = c.parsed.y; if (!v || v < 0.01) return null; return '  ' + c.dataset.label + ': $' + v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); },
+            footer: items => 'Total: $' + items.reduce((s,i)=>s+(i.parsed.y||0),0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: TICK_COLOR } },
+        y: { stacked: true, grid: { color: GRID_COLOR }, border: { display: false }, ticks: { callback: v => '$'+(v/1000).toFixed(0)+'k', font: { size: 11 }, color: TICK_COLOR } }
+      },
+      onClick(e, elements) { if (elements.length) openMonthPanel(MONTHS[elements[0].index]); },
+      onHover(e, elements) { e.native.target.style.cursor = elements.length ? 'pointer' : 'default'; }
+    }
   });
 })();
 
 // ── Trend line chart ──────────────────────────────────────────────
-new Chart(document.getElementById('trendChart'), {
-  type: 'line',
-  data: {
-    labels: MONTHS,
-    datasets: [{
-      data: SPEND,
-      borderColor: '#5138a8',
-      backgroundColor: 'rgba(81,56,168,0.08)',
-      fill: true,
-      tension: 0.4,
-      pointRadius: 4,
-      pointBackgroundColor: '#5138a8',
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { callbacks: { label: c => '$' + c.parsed.y.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) } }
+(function() {
+  if (!SPEND.length || !MONTHS.length) return; // wait for CSV upload
+  const ma3 = SPEND.map((_, i) => {
+    if (i < 1) return null;
+    const slice = SPEND.slice(Math.max(0, i - 1), i + 2).filter((_, j, a) => (i - 1 + j) < SPEND.length);
+    const from = Math.max(0, i - 1), to = Math.min(SPEND.length - 1, i + 1);
+    const vals = SPEND.slice(from, to + 1);
+    return vals.reduce((a, v) => a + v, 0) / vals.length;
+  });
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        {
+          label: 'Monthly spend',
+          data: SPEND,
+          borderColor: '#5138a8',
+          backgroundColor: 'rgba(81,56,168,0.08)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: '#5138a8',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          order: 2
+        },
+        {
+          label: '3-month avg',
+          data: ma3,
+          borderColor: '#b85c00',
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.4,
+          pointRadius: 0,
+          borderWidth: 2.5,
+          borderDash: [5, 4],
+          spanGaps: true,
+          order: 1
+        }
+      ]
     },
-    scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: TICK_COLOR } },
-      y: { grid: { color: GRID_COLOR }, border: { display: false },
-           ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k', font: { size: 11 }, color: TICK_COLOR } }
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: {
+            boxWidth: 22,
+            boxHeight: 2,
+            padding: 12,
+            font: { size: 11, family: 'DM Mono' },
+            color: '#8a8680',
+            usePointStyle: false
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: c => c.dataset.label + ': $' + c.parsed.y.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, color: TICK_COLOR } },
+        y: { grid: { color: GRID_COLOR }, border: { display: false },
+             ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k', font: { size: 11 }, color: TICK_COLOR } }
+      }
     }
-  }
-});
+  });
+})();
 
 // ── Donut chart ───────────────────────────────────────────────────
-new Chart(document.getElementById('donutChart'), {
+if (CATS.length) new Chart(document.getElementById('donutChart'), {
   type: 'doughnut',
   data: {
     labels: CATS.map(c => c.name),
@@ -1835,7 +2120,7 @@ new Chart(document.getElementById('donutChart'), {
 
 // Merchant bar
 const sortedM = [...MERCHANTS].sort((a,b) => b.spend - a.spend).slice(0,15);
-new Chart(document.getElementById('merchantChart'), {
+if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
   type: 'bar',
   data: {
     labels: sortedM.map(m => m.name),
@@ -1862,13 +2147,15 @@ new Chart(document.getElementById('merchantChart'), {
 (function() {
 
   // ── DOM refs ─────────────────────────────────────────────────
-  const uploadBanner   = document.getElementById('uploadBanner');
-  const fileInput      = document.getElementById('fileInput');
-  const uploadBtn      = document.getElementById('uploadBtn');
-  const uploadStatus   = document.getElementById('uploadStatus');
-  const uploadProgress = document.getElementById('uploadProgress');
-  const uploadProgressBar = document.getElementById('uploadProgressBar');
-  const modalBackdrop  = document.getElementById('modalBackdrop');
+  const uploadBanner        = document.getElementById('uploadBanner');
+  const uploadPopupBackdrop = document.getElementById('uploadPopupBackdrop');
+  const uploadDropZone      = document.getElementById('uploadDropZone');
+  const fileInput           = document.getElementById('fileInput');
+  const uploadBtn           = document.getElementById('uploadBtn');
+  const uploadStatus        = document.getElementById('uploadStatus');
+  const uploadProgress      = document.getElementById('uploadProgress');
+  const uploadProgressBar   = document.getElementById('uploadProgressBar');
+  const modalBackdrop       = document.getElementById('modalBackdrop');
   const modalSub       = document.getElementById('modalSub');
   const modalSample    = document.getElementById('modalSample');
   const fieldRowsEl    = document.getElementById('fieldRows');
@@ -2219,49 +2506,52 @@ new Chart(document.getElementById('merchantChart'), {
     window.MERCHANTS    = merchantsArr;
     window.ALL_TXN      = txns;
 
+    // ── Persist to localStorage ─────────────────────────────────
+    try {
+      const payload = JSON.stringify(txns.map(t => ({ d: t.d, desc: t.desc, amt: t.amt, cat: t.cat })));
+      localStorage.setItem('txr_txns', payload);
+      localStorage.setItem('txr_saved', Date.now());
+    } catch(e) { console.warn('localStorage save failed:', e.message); }
+
     // ── Update hero header ──────────────────────────────────────
-    document.querySelector('.hero-badge').textContent = 'Imported Data · Transaction Analysis';
-    document.querySelector('.hero h1').innerHTML = 'Transaction<br><em>Analysis</em> Report';
-    const metaSpans = document.querySelectorAll('.hero-meta span');
-    if (metaSpans[0]) metaSpans[0].textContent = `Period: ${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
-    if (metaSpans[1]) metaSpans[1].textContent = `Generated: ${new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})}`;
-    if (metaSpans[2]) metaSpans[2].textContent = `${txns.length} transactions`;
+    const heroBadge = document.querySelector('.hero-badge');
+    if (heroBadge) heroBadge.textContent = 'Statement Analysis';
+    const heroperiod = document.getElementById('heroPeriod');
+    if (heroperiod) heroperiod.textContent = `Period: ${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
+    const heroGen = document.getElementById('heroGenerated');
+    if (heroGen) heroGen.textContent = `Generated: ${new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})}`;
+    const heroSrc = document.getElementById('heroSource');
+    if (heroSrc) heroSrc.textContent = `${txns.length} transactions`;
 
-    // ── Show sections & update metric cards ─────────────────────
-    const metricsSec = document.getElementById('metricsSection');
-    if (metricsSec) metricsSec.style.display = '';
-    const obsSec = document.getElementById('observationsSection');
-    if (obsSec) obsSec.style.display = '';
-    const recSec = document.getElementById('recommendationsSection');
-    if (recSec) recSec.style.display = '';
-    const footerEl = document.getElementById('reportFooter');
-    if (footerEl) footerEl.style.display = '';
-
-    const mTS = document.getElementById('metricTotalSpent');
-    const mAM = document.getElementById('metricAvgMonthly');
-    const mTC = document.getElementById('metricTotalCredits');
-    const mNT = document.getElementById('metricNumTxns');
-    const mPR = document.getElementById('metricPeriod');
-    const mMO = document.getElementById('metricMonths');
-    if (mTS) mTS.textContent = '$' + totalSpend.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-    if (mAM) mAM.textContent = '$' + Math.round(totalSpend / activeMos).toLocaleString();
-    if (mTC) mTC.textContent = '$0.00';
-    if (mNT) mNT.textContent = txns.length.toLocaleString();
-    if (mPR) mPR.textContent = `${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
-    if (mMO) mMO.textContent = `across ${activeMos} month${activeMos !== 1 ? 's' : ''}`;
+    // ── Update metric cards ─────────────────────────────────────
+    const el = id => document.getElementById(id);
+    if (el('metTotalSpend'))  el('metTotalSpend').textContent  = '$' + totalSpend.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    if (el('metAvgMonthly'))  el('metAvgMonthly').textContent  = '$' + Math.round(totalSpend / activeMos).toLocaleString();
+    if (el('metTotalCredit')) el('metTotalCredit').textContent = '$0.00';
+    if (el('metTxnCount'))    el('metTxnCount').textContent    = txns.length.toLocaleString();
+    if (el('metPeriod'))      el('metPeriod').textContent      = `${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
+    if (el('metMonths'))      el('metMonths').textContent      = `across ${activeMos} month${activeMos !== 1 ? 's' : ''}`;
 
     // ── Update section 2 chart title ───────────────────────────
     const peakMonth = allMonths[spendArr.indexOf(Math.max(...spendArr))];
-    const peakEl = document.querySelector('.section:nth-of-type(2) .chart-title');
+    const peakEl = document.getElementById('monthlyChartTitle');
     if (peakEl) peakEl.textContent = `${peakMonth || 'Peak'} was the highest spending month`;
 
     // ── Update section 3 donut title ───────────────────────────
     const top2 = catsArr.slice(0,2);
     const top2pct = top2.length > 1 ? Math.round((top2[0].val + top2[1].val) / totalSpend * 100) : 0;
-    const donutTitle = document.querySelector('#donutChart')?.closest('.chart-card')?.querySelector('.chart-title');
+    const donutTitle = document.getElementById('donutChartTitle');
     if (donutTitle && top2.length >= 2) {
       donutTitle.textContent = `${top2[0].name} & ${top2[1].name} = ${top2pct}% of total spend`;
     }
+
+    // ── Update merchant chart title ─────────────────────────────
+    const merchantTitle = document.getElementById('merchantChartTitle');
+    if (merchantTitle) merchantTitle.textContent = 'Top merchants by spend';
+
+    // ── Update footer ───────────────────────────────────────────
+    const footerLine1 = document.getElementById('footerLine1');
+    if (footerLine1) footerLine1.textContent = `Statement Analysis · ${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)} · ${txns.length} transactions`;
 
     // ── Rebuild donut legend ────────────────────────────────────
     const donutLegend = document.querySelector('.donut-legend');
@@ -2270,11 +2560,6 @@ new Chart(document.getElementById('merchantChart'), {
         `<div class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.name}</div>`
       ).join('');
     }
-
-    // ── Update footer ───────────────────────────────────────────
-    const footerPs = document.querySelectorAll('.footer p');
-    if (footerPs[0]) footerPs[0].textContent = `Imported data · ${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
-    if (footerPs[1]) footerPs[1].textContent = `Categories by keyword matching · ${txns.length} transactions · Not financial advice`;
 
     // ── Regenerate observations ─────────────────────────────────
     generateObservations(txns, catsArr, merchantsArr, totalSpend);
@@ -2290,10 +2575,13 @@ new Chart(document.getElementById('merchantChart'), {
 
     // ── Rebuild merchant table ──────────────────────────────────
     rebuildMerchantTable(merchantsArr);
+
+    // ── Update hero metrics ─────────────────────────────────────
+    if (typeof updateMetrics === 'function') updateMetrics();
   }
 
   function generateObservations(txns, cats, merchants, total) {
-    const obsGrid = document.querySelector('.obs-grid');
+    const obsGrid = document.getElementById('obsGrid') || document.querySelector('.obs-grid');
     if (!obsGrid) return;
 
     const topCat = cats[0] || { name: 'N/A', val: 0 };
@@ -2323,7 +2611,7 @@ new Chart(document.getElementById('merchantChart'), {
   }
 
   function generateRecommendations(cats) {
-    const recList = document.querySelector('.rec-list');
+    const recList = document.getElementById('recList') || document.querySelector('.rec-list');
     if (!recList) return;
 
     const suggestions = {
@@ -2387,6 +2675,14 @@ new Chart(document.getElementById('merchantChart'), {
           scales: {
             x: { stacked: true, grid: { display: false }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 } } },
             y: { stacked: true, grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0)+'k' } }
+          },
+          onClick(e, elements) {
+            if (!elements.length) return;
+            const mi = elements[0].index;
+            if (typeof window._openMonthPanel === 'function') window._openMonthPanel(months[mi], mi);
+          },
+          onHover(e, elements) {
+            e.native.target.style.cursor = elements.length ? 'pointer' : 'default';
           }
         }
       });
@@ -2395,15 +2691,26 @@ new Chart(document.getElementById('merchantChart'), {
     // ── Trend line chart ────────────────────────────────────────
     const trendCtx = document.getElementById('trendChart');
     if (trendCtx) {
+      const ma3r = spend.map((_, i) => {
+        const from = Math.max(0, i - 1), to = Math.min(spend.length - 1, i + 1);
+        const vals = spend.slice(from, to + 1);
+        return i < 1 ? null : vals.reduce((a, v) => a + v, 0) / vals.length;
+      });
       new Chart(trendCtx, {
         type: 'line',
         data: {
           labels: months,
-          datasets: [{ data: spend, borderColor: '#1e5fa8', backgroundColor: 'rgba(30,95,168,0.07)', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#1e5fa8', fill: true, tension: 0.35 }]
+          datasets: [
+            { label: 'Monthly spend', data: spend, borderColor: '#1e5fa8', backgroundColor: 'rgba(30,95,168,0.07)', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#1e5fa8', fill: true, tension: 0.35, order: 2 },
+            { label: '3-month avg', data: ma3r, borderColor: '#b85c00', backgroundColor: 'transparent', fill: false, tension: 0.4, pointRadius: 0, borderWidth: 2.5, borderDash: [5, 4], spanGaps: true, order: 1 }
+          ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => '$' + ctx.raw.toLocaleString(undefined,{maximumFractionDigits:0}) } } },
+          plugins: {
+            legend: { display: true, position: 'top', align: 'end', labels: { boxWidth: 22, boxHeight: 2, padding: 12, font: { size: 11, family: 'DM Mono' }, color: '#8a8680' } },
+            tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + ctx.raw.toLocaleString(undefined,{maximumFractionDigits:0}) } }
+          },
           scales: {
             x: { grid: { display: false }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 } } },
             y: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0)+'k' } }
@@ -2497,14 +2804,20 @@ new Chart(document.getElementById('merchantChart'), {
 
   // ── UI helpers ────────────────────────────────────────────────
   function setStatus(msg, isError) {
+    if (!uploadStatus) return;
     uploadStatus.textContent = msg;
     uploadStatus.className = 'upload-status' + (msg ? ' visible' : '') + (isError ? ' error' : '');
   }
 
   function setProgress(pct) {
+    if (!uploadProgress) return;
     uploadProgress.className = 'upload-progress' + (pct >= 0 ? ' visible' : '');
-    uploadProgressBar.style.width = pct + '%';
+    if (uploadProgressBar) uploadProgressBar.style.width = pct + '%';
   }
+
+  // ── Expose functions globally ─────────────────────────────────
+  window._legacyHandleFile = handleFile;
+  window._rebuildReport    = rebuildReport;
 
   // ── File handling ─────────────────────────────────────────────
   function handleFile(file) {
@@ -2597,24 +2910,62 @@ new Chart(document.getElementById('merchantChart'), {
         setProgress(-1);
         uploadBanner.classList.remove('processing');
         setStatus(`✓ Report generated from ${txns.length} transactions (${skipped} rows skipped)`, false);
-        // Update upload button
-        uploadBtn.textContent = 'Upload new file';
+        // Update import button label
+        document.getElementById('btnOpenUpload').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg> Re-import data';
+        // Close popup after a short delay so user sees the success message
+        setTimeout(() => closeUploadPopup(), 1400);
       }, 300);
     }, 100);
   });
 
-  // ── Event listeners ───────────────────────────────────────────
-  uploadBtn.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+  // ── Upload popup open / close ─────────────────────────────
+  function openUploadPopup() {
+    if (uploadPopupBackdrop) uploadPopupBackdrop.classList.add('visible');
+  }
+  function closeUploadPopup() {
+    if (uploadPopupBackdrop) uploadPopupBackdrop.classList.remove('visible');
+    setStatus('', false);
+    setProgress(-1);
+    if (uploadBanner) uploadBanner.classList.remove('processing');
+    // Ensure dashboard is visible and upload screen is hidden
+    const us = document.getElementById('uploadScreen');
+    const db = document.getElementById('dashboard');
+    if (us) us.style.display = 'none';
+    if (db) db.style.display = 'block';
+  }
 
-  // Drag & drop
-  uploadBanner.addEventListener('dragover', (e) => { e.preventDefault(); uploadBanner.classList.add('drag-over'); });
-  uploadBanner.addEventListener('dragleave', () => uploadBanner.classList.remove('drag-over'));
-  uploadBanner.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadBanner.classList.remove('drag-over');
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-  });
+  if (document.getElementById('btnOpenUpload')) {
+    document.getElementById('btnOpenUpload').addEventListener('click', () => {
+      const us = document.getElementById('uploadScreen');
+      const db = document.getElementById('dashboard');
+      if (us) { us.style.display = 'flex'; }
+      if (db) { db.style.display = 'none'; }
+    });
+  }
+  if (document.getElementById('uploadPopupClose')) {
+    document.getElementById('uploadPopupClose').addEventListener('click', closeUploadPopup);
+  }
+  if (uploadPopupBackdrop) {
+    uploadPopupBackdrop.addEventListener('click', (e) => {
+      if (e.target === uploadPopupBackdrop) closeUploadPopup();
+    });
+  }
+
+  // ── Event listeners ───────────────────────────────────────────
+  if (uploadBtn) uploadBtn.addEventListener('click', () => { if (fileInput) fileInput.click(); });
+  if (uploadDropZone) uploadDropZone.addEventListener('click', (e) => { if (e.target !== uploadBtn && fileInput) fileInput.click(); });
+  if (fileInput) fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+  // Drag & drop on the drop zone
+  if (uploadDropZone) {
+    uploadDropZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadDropZone.classList.add('drag-over'); });
+    uploadDropZone.addEventListener('dragleave', () => uploadDropZone.classList.remove('drag-over'));
+    uploadDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadDropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+  }
 
 })();
 
