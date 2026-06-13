@@ -1815,7 +1815,12 @@ function updateMetrics() {
     const f = e.dataTransfer.files[0];
     if (f) handleFile(f);
   });
-  fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  fileInput.addEventListener('change', e => {
+    if (e.target.files[0]) {
+      handleFile(e.target.files[0]);
+      e.target.value = ''; // reset so same file can be re-selected
+    }
+  });
 
   if (openBtn) openBtn.addEventListener('click', () => {
     dashboard.style.display = 'none';
@@ -2118,6 +2123,36 @@ if (CATS.length) new Chart(document.getElementById('donutChart'), {
   }
 });
 
+// ── Merchant chart label-left plugin (registered once) ───────────
+if (!Chart.registry.plugins.get('merchantLabelLeft')) {
+  Chart.register({
+    id: 'merchantLabelLeft',
+    afterDraw(chart) {
+      if (!chart.config.options._merchantLabelLeft) return;
+      const yAxis = chart.scales.y;
+      if (!yAxis) return;
+      const ctx = chart.ctx;
+      const ticks = yAxis.ticks;
+      const labels = chart.data.labels;
+      ctx.save();
+      ctx.font = `12px Figtree, sans-serif`;
+      ctx.fillStyle = '#8a8680';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      // clip to left axis area
+      ctx.beginPath();
+      ctx.rect(0, yAxis.top, yAxis.right - 4, yAxis.bottom - yAxis.top);
+      ctx.clip();
+      ticks.forEach((tick, i) => {
+        const y = yAxis.getPixelForTick(i);
+        const label = String(labels[i] || '');
+        ctx.fillText(label, 4, y);
+      });
+      ctx.restore();
+    }
+  });
+}
+
 // Merchant bar
 const sortedM = [...MERCHANTS].sort((a,b) => b.spend - a.spend).slice(0,15);
 if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
@@ -2133,10 +2168,12 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
   options: {
     indexAxis: 'y',
     responsive: true, maintainAspectRatio: false,
+    _merchantLabelLeft: true,
+    layout: { padding: { left: 0 } },
     plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => '$' + c.parsed.x.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) } } },
     scales: {
       x: { grid: { color: GRID_COLOR }, ticks: { callback: v => '$' + v.toLocaleString(), font: { size: 11 }, color: TICK_COLOR }, border: { display: false } },
-      y: { grid: { display: false }, ticks: { font: { size: 12 }, color: TICK_COLOR } }
+      y: { grid: { display: false }, ticks: { display: false }, afterFit(axis) { axis.width = 165; } }
     }
   }
 });
@@ -2251,7 +2288,9 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
 
   // ── CSV parser ───────────────────────────────────────────────
   function parseCSV(text) {
-    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    // Strip UTF-8 BOM if present
+    const cleaned = text.replace(/^\uFEFF/, '');
+    const lines = cleaned.split(/\r?\n/).filter(l => l.trim());
     if (lines.length < 2) return { headers: [], rows: [] };
 
     function splitCSV(line) {
@@ -2658,6 +2697,20 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
         if (monthlyByCat[t.cat]) monthlyByCat[t.cat][mi] += t.amt;
         else if (monthlyByCat['Other']) monthlyByCat['Other'][mi] += t.amt;
       });
+
+      // ── Rebuild legend ────────────────────────────────────────
+      const legendEl = document.getElementById('monthlyLegend');
+      if (legendEl) {
+        legendEl.innerHTML = '';
+        cats.forEach(c => {
+          const total = (monthlyByCat[c.name] || []).reduce((s,v) => s+v, 0);
+          if (total < 1) return;
+          const item = document.createElement('div');
+          item.className = 'legend-item';
+          item.innerHTML = '<span class="legend-dot" style="background:' + c.color + ';width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;margin-right:6px"></span>' + c.name;
+          legendEl.appendChild(item);
+        });
+      }
       new Chart(barCtx, {
         type: 'bar',
         data: {
@@ -2747,10 +2800,12 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
         },
         options: {
           indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+          _merchantLabelLeft: true,
+          layout: { padding: { left: 0 } },
           plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => '$' + ctx.raw.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) } } },
           scales: {
             x: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0)+'k' } },
-            y: { grid: { display: false }, ticks: { color: TICK_COLOR, font: { size: 11 } } }
+            y: { grid: { display: false }, ticks: { display: false }, afterFit(axis) { axis.width = 165; } }
           }
         }
       });
@@ -2934,14 +2989,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     if (db) db.style.display = 'block';
   }
 
-  if (document.getElementById('btnOpenUpload')) {
-    document.getElementById('btnOpenUpload').addEventListener('click', () => {
-      const us = document.getElementById('uploadScreen');
-      const db = document.getElementById('dashboard');
-      if (us) { us.style.display = 'flex'; }
-      if (db) { db.style.display = 'none'; }
-    });
-  }
+  // btnOpenUpload is handled by the new upload screen IIFE above
   if (document.getElementById('uploadPopupClose')) {
     document.getElementById('uploadPopupClose').addEventListener('click', closeUploadPopup);
   }
@@ -2954,7 +3002,12 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
   // ── Event listeners ───────────────────────────────────────────
   if (uploadBtn) uploadBtn.addEventListener('click', () => { if (fileInput) fileInput.click(); });
   if (uploadDropZone) uploadDropZone.addEventListener('click', (e) => { if (e.target !== uploadBtn && fileInput) fileInput.click(); });
-  if (fileInput) fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+  if (fileInput) fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) {
+      handleFile(fileInput.files[0]);
+      fileInput.value = '';
+    }
+  });
 
   // Drag & drop on the drop zone
   if (uploadDropZone) {
