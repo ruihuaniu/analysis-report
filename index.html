@@ -1140,9 +1140,13 @@
       <span id="heroGenerated">Generated: —</span>
       <span id="heroSource">—</span>
     </div>
-    <button id="btnOpenUpload" title="Import your own data" aria-label="Import transaction data" style="position:absolute;top:52px;right:0;display:flex;align-items:center;gap:7px;background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:8px 14px;font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:500;color:var(--ink2);cursor:pointer;transition:background 0.15s,border-color 0.15s,color 0.15s;white-space:nowrap;">
+    <button id="btnOpenUpload" title="Import your own data" aria-label="Import transaction data" style="position:absolute;top:52px;right:152px;display:flex;align-items:center;gap:7px;background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:8px 14px;font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:500;color:var(--ink2);cursor:pointer;transition:background 0.15s,border-color 0.15s,color 0.15s;white-space:nowrap;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg>
       Import data
+    </button>
+    <button id="btnDownloadHtml" title="Download a self-contained HTML file with this data baked in" aria-label="Download shareable HTML" style="position:absolute;top:52px;right:0;display:flex;align-items:center;gap:7px;background:var(--ink);border:1px solid var(--ink);border-radius:8px;padding:8px 14px;font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:500;color:var(--paper);cursor:pointer;transition:opacity 0.15s;white-space:nowrap;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 4v12m0 0-4-4m4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 18v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Download HTML
     </button>
     <div class="hero-accent"></div>
   </header>
@@ -1461,9 +1465,9 @@ function rebuildDashboard(months, spend, cats, merchants, txns, totalSpend, tota
 // ── localStorage restore ──────────────────────────────────────────
 (function restoreFromStorage() {
   try {
-    const raw = localStorage.getItem('txr_txns');
+    const raw = window.EMBEDDED_DATA ? JSON.stringify(window.EMBEDDED_DATA) : localStorage.getItem('txr_txns');
     if (!raw) return;
-    const saved = localStorage.getItem('txr_saved');
+    const saved = window.EMBEDDED_DATA ? null : localStorage.getItem('txr_saved');
     const txns = JSON.parse(raw);
     if (!Array.isArray(txns) || !txns.length) return;
 
@@ -1482,10 +1486,14 @@ function rebuildDashboard(months, spend, cats, merchants, txns, totalSpend, tota
 
     // Show a restore notice on the hero
     const heroSrc = document.getElementById('heroSource');
-    if (heroSrc && saved) {
-      const ago = new Date(+saved);
-      heroSrc.textContent = 'Restored · ' + txns.length + ' transactions · saved '
-        + ago.toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+    if (heroSrc) {
+      if (window.EMBEDDED_DATA) {
+        heroSrc.textContent = 'Loaded · ' + txns.length + ' transactions (baked into this file)';
+      } else if (saved) {
+        const ago = new Date(+saved);
+        heroSrc.textContent = 'Restored · ' + txns.length + ' transactions · saved '
+          + ago.toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+      }
     }
 
     // Run the full rebuild pipeline (charts, tables, metrics, observations)
@@ -1497,6 +1505,40 @@ function rebuildDashboard(months, spend, cats, merchants, txns, totalSpend, tota
   } catch(e) {
     console.warn('localStorage restore failed:', e.message);
   }
+})();
+
+// ── Download a self-contained, shareable copy of this report ──────
+(function setupDownloadHtml() {
+  const btn = document.getElementById('btnDownloadHtml');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    const raw = localStorage.getItem('txr_txns');
+    if (!raw) {
+      alert('Import a CSV first — there\'s no data to bake in yet.');
+      return;
+    }
+    try {
+      let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const marker = '<script>\n// ── Data — populated by CSV upload';
+      if (html.includes(marker)) {
+        html = html.replace(
+          marker,
+          '<script>\nwindow.EMBEDDED_DATA = ' + raw + ';\n// ── Data — populated by CSV upload'
+        );
+      }
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'transaction-report-' + new Date().toISOString().slice(0, 10) + '.html';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Could not generate the file: ' + e.message);
+    }
+  });
 })();
 
 
@@ -2011,7 +2053,7 @@ function updateMetrics() {
       },
       scales: {
         x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: TICK_COLOR } },
-        y: { stacked: true, grid: { color: GRID_COLOR }, border: { display: false }, ticks: { callback: v => '$'+(v/1000).toFixed(0)+'k', font: { size: 11 }, color: TICK_COLOR } }
+        y: { stacked: true, grid: { color: GRID_COLOR }, border: { display: false }, ticks: { callback: v => { if (v < 1000) return '$' + v.toLocaleString(); const k = Math.round(v/100)/10; return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k'; }, font: { size: 11 }, color: TICK_COLOR } }
       },
       onClick(e, elements) { if (elements.length) openMonthPanel(MONTHS[elements[0].index]); },
       onHover(e, elements) { e.native.target.style.cursor = elements.length ? 'pointer' : 'default'; }
@@ -2087,8 +2129,8 @@ function updateMetrics() {
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 11 }, color: TICK_COLOR } },
-        y: { grid: { color: GRID_COLOR }, border: { display: false },
-             ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k', font: { size: 11 }, color: TICK_COLOR } }
+        y: { grid: { color: GRID_COLOR }, border: { display: false }, beginAtZero: true, min: 0,
+             ticks: { callback: v => { if (v < 1000) return '$' + v.toLocaleString(); const k = Math.round(v/100)/10; return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k'; }, font: { size: 11 }, color: TICK_COLOR } }
       }
     }
   });
@@ -2205,7 +2247,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
   // ── Category keyword rules ───────────────────────────────────
   const CAT_RULES = [
     { cat: 'Groceries & supermarkets', keys: ['woolworths','coles','aldi','costco','foodness','asian market','daily mart','kfl supermarket','sao sang','yuchens','kfl ','breadtop','bakers delight','colonial fruit','melb asian','melb onstreet','why sweet','xiangbalao','koreast','whitehorse road liquor','palgong','happy mart','hu hui','bakers','woolies'] },
-    { cat: 'Dining & takeaway',        keys: ['hunan','momo tea','jiangnan','cafe','restaurant','noodle','dumpling','kitchen','pizza','kfc','mcdonalds','mcdonald','eatery','takeway','ramen','sushi','pho','banh mi','dining','food group','tasty house','cafe sigma','cwh forest','daniel','golden noodle','rainbowtown','zonzo','farmhouse','fragrant','peking','dooboo','secret kitchen','top tea','uncle tetsu','heytea','gotcha','roll d','bay city','sober ramen','ichimi','liangs','infuse mw','sing jill','hong kong asian','bon cafe','top fun','eastwood eatery','chn','boost juice','hungry jack','domino','subway','the sober','harbour cafe'] },
+    { cat: 'Dining & takeaway',        keys: ['hunan','momo tea','jiangnan','cafe','restaurant','noodle','dumpling','kitchen','pizza','kfc','mcdonalds','mcdonald','eatery','takeway','ramen','sushi','pho','banh mi','dining','food group','tasty house','cafe sigma','cwh forest','daniel','golden noodle','rainbowtown','zonzo','farmhouse','fragrant','peking','dooboo','secret kitchen','top tea','uncle tetsu','heytea','gotcha','roll d','bay city','sober ramen','ichimi','liangs','infuse mw','sing jill','hong kong asian','bon cafe','top fun','eastwood eatery','boost juice','hungry jack','domino','subway','the sober','harbour cafe'] },
     { cat: 'Hardware & home',          keys: ['bunnings','ikea','mycar','bbq revolution','peppy planet','bed bath','boronia car','harris scarfe','spotlight','temple & webster','spotlight'] },
     { cat: 'Utilities & bills',        keys: ['globird','superloop','bpay','club lime','amaysim','optus','wooliesmobile','yarravalleywater','centrelink','viva leisure','onepass','tangerine telecom','budget','tax office','whitehorse city','deft payments','rates','electricity','water','council','energy'] },
     { cat: 'Travel & accommodation',   keys: ['booking.com','big4','ingenia','portland bay','phillip island','skybus','myki','trip.com','searoad','hotel','flight','accommodation','holiday park','airbnb','uber','airport'] },
@@ -2724,10 +2766,21 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                title: items => items[0].label,
+                label: c => { const v = c.parsed.y; if (!v || v < 0.01) return null; return '  ' + c.dataset.label + ': $' + v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); },
+                footer: items => 'Total: $' + items.reduce((s,i)=>s+(i.parsed.y||0),0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})
+              }
+            }
+          },
           scales: {
             x: { stacked: true, grid: { display: false }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 } } },
-            y: { stacked: true, grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0)+'k' } }
+            y: { stacked: true, grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => { if (v < 1000) return '$' + v.toLocaleString(); const k = Math.round(v/100)/10; return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k'; } } }
           },
           onClick(e, elements) {
             if (!elements.length) return;
@@ -2766,7 +2819,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
           },
           scales: {
             x: { grid: { display: false }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 } } },
-            y: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0)+'k' } }
+            y: { grid: { color: GRID_COLOR }, beginAtZero: true, min: 0, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => { if (v < 1000) return '$' + v.toLocaleString(); const k = Math.round(v/100)/10; return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k'; } } }
           }
         }
       });
@@ -2804,7 +2857,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
           layout: { padding: { left: 0 } },
           plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => '$' + ctx.raw.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) } } },
           scales: {
-            x: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => '$' + (v/1000).toFixed(0)+'k' } },
+            x: { grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => { if (v < 1000) return '$' + v.toLocaleString(); const k = Math.round(v/100)/10; return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k'; } } },
             y: { grid: { display: false }, ticks: { display: false }, afterFit(axis) { axis.width = 165; } }
           }
         }
