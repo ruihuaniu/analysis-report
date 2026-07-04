@@ -39,6 +39,7 @@
     background: var(--paper);
     color: var(--ink);
     line-height: 1.6;
+    overflow-x: hidden;
   }
 
   /* ── Page layout ─────────────────────────────────────── */
@@ -399,6 +400,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 560px) {
+    .txn-panel-toolbar { flex-direction: column; align-items: stretch; }
+    .txn-panel-toolbar-right { width: 100%; }
+    .txn-panel-toolbar-right .txn-search { flex: 1 1 140px; width: auto; }
+    .detail-sort-group { flex: 1 1 auto; justify-content: center; }
   }
   .txn-search {
     border: 1px solid var(--paper3);
@@ -1031,6 +1039,42 @@
     margin-top: 20px;
   }
 
+  /* ── Hero action buttons (Import / Download) ─────────────── */
+  .hero-actions {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+  }
+  .hero-actions button {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #btnOpenUpload {
+    background: var(--paper2);
+    border: 1px solid var(--paper3);
+    color: var(--ink2);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  #btnDownloadHtml {
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: var(--paper);
+    transition: opacity 0.15s;
+  }
+
   /* ── Import button hover ─────────────────────────────────── */
   #btnOpenUpload:hover {
     background: var(--paper3);
@@ -1052,8 +1096,19 @@
     pointer-events: none;
   }
 
-  @media (max-width: 500px) {
-    #btnOpenUpload span { display: none; }
+  @media (max-width: 640px) {
+    /* Buttons drop out of the header and flow below the title instead of
+       overlapping it or overflowing the viewport width */
+    .hero-actions {
+      position: static;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .hero-actions button { flex: 1 1 auto; justify-content: center; }
+  }
+  @media (max-width: 420px) {
+    .hero-actions button span { display: none; }
+    .hero-actions button { flex: 0 0 auto; padding: 9px 12px; }
   }
 </style>
 </head>
@@ -1140,14 +1195,16 @@
       <span id="heroGenerated">Generated: —</span>
       <span id="heroSource">—</span>
     </div>
-    <button id="btnOpenUpload" title="Import your own data" aria-label="Import transaction data" style="position:absolute;top:52px;right:152px;display:flex;align-items:center;gap:7px;background:var(--paper2);border:1px solid var(--paper3);border-radius:8px;padding:8px 14px;font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:500;color:var(--ink2);cursor:pointer;transition:background 0.15s,border-color 0.15s,color 0.15s;white-space:nowrap;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg>
-      Import data
-    </button>
-    <button id="btnDownloadHtml" title="Download a self-contained HTML file with this data baked in" aria-label="Download shareable HTML" style="position:absolute;top:52px;right:0;display:flex;align-items:center;gap:7px;background:var(--ink);border:1px solid var(--ink);border-radius:8px;padding:8px 14px;font-family:'Figtree',sans-serif;font-size:12.5px;font-weight:500;color:var(--paper);cursor:pointer;transition:opacity 0.15s;white-space:nowrap;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 4v12m0 0-4-4m4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 18v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      Download HTML
-    </button>
+    <div class="hero-actions">
+      <button id="btnOpenUpload" title="Import your own data" aria-label="Import transaction data">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span>Import data</span>
+      </button>
+      <button id="btnDownloadHtml" title="Download a self-contained HTML file with this data baked in" aria-label="Download shareable HTML">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 4v12m0 0-4-4m4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 18v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Download HTML</span>
+      </button>
+    </div>
     <div class="hero-accent"></div>
   </header>
 
@@ -1213,6 +1270,9 @@
               <button class="detail-sort-btn" data-mmsort="desc">$ ↓</button>
             </div>
             <input class="txn-search" type="text" placeholder="Search…" id="monthlyPanelSearch">
+            <select class="txn-search" id="monthlyPanelCatFilter" style="cursor:pointer;">
+              <option value="">All categories</option>
+            </select>
             <button class="btn-collapse" id="btnMonthlyCollapse" title="Close" aria-label="Close month panel">✕</button>
           </div>
         </div>
@@ -1252,7 +1312,7 @@
           <div class="legend-item"><span class="legend-dot" style="background:#1e5fa8"></span>Dining &amp; takeaway</div>
           <div class="legend-item"><span class="legend-dot" style="background:#b85c00"></span>Hardware &amp; home</div>
           <div class="legend-item"><span class="legend-dot" style="background:#b5365a"></span>Utilities &amp; bills</div>
-          <div class="legend-item"><span class="legend-dot" style="background:#5138a8"></span>Fuel</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#5138a8"></span>Car & Fuel</div>
           <div class="legend-item"><span class="legend-dot" style="background:#7a9e1a"></span>Travel &amp; accommodation</div>
           <div class="legend-item"><span class="legend-dot" style="background:#c44020"></span>Other</div>
         </div>
@@ -1920,10 +1980,12 @@ function updateMetrics() {
   const monthlyPanelList    = document.getElementById('monthlyPanelList');
   const monthlyPanelCount   = document.getElementById('monthlyPanelCount');
   const monthlyPanelSearch  = document.getElementById('monthlyPanelSearch');
+  const monthlyPanelCatFilter = document.getElementById('monthlyPanelCatFilter');
   const btnMonthlyCollapse  = document.getElementById('btnMonthlyCollapse');
   let activeMonthKey = null;
   let monthSort  = 'date';
   let monthSearch = '';
+  let monthCatFilter = '';
 
   const mmMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function parseDateObj(s) {
@@ -1935,7 +1997,10 @@ function updateMetrics() {
     activeMonthKey = monthKey;
     monthSort  = 'date';
     monthSearch = '';
+    monthCatFilter = '';
     if (monthlyPanelSearch) monthlyPanelSearch.value = '';
+    if (monthlyPanelCatFilter) monthlyPanelCatFilter.value = '';
+    populateMonthCatFilter();
     document.querySelectorAll('[data-mmsort]').forEach(b => b.classList.toggle('active', b.dataset.mmsort === 'date'));
     renderMonthPanel();
     if (monthlyPanel) {
@@ -1946,10 +2011,26 @@ function updateMetrics() {
   // Expose globally — called by the rebuilt chart onClick after CSV upload
   window._openMonthPanel = openMonthPanel;
 
+  function populateMonthCatFilter() {
+    if (!monthlyPanelCatFilter || !activeMonthKey) return;
+    const key = activeMonthKey;
+    const spendByCat = {};
+    (window.ALL_TXN || []).forEach(t => {
+      if (parseMonthKey(t.d) !== key) return;
+      spendByCat[t.cat] = (spendByCat[t.cat] || 0) + t.amt;
+    });
+    const cats = Object.keys(spendByCat).sort((a,b) => spendByCat[b] - spendByCat[a]);
+    monthlyPanelCatFilter.innerHTML = '<option value="">All categories</option>'
+      + cats.map(c => '<option value="' + c.replace(/"/g,'&quot;') + '">' + c + '</option>').join('');
+  }
+
   function renderMonthPanel() {
     if (!activeMonthKey) return;
     const key = activeMonthKey;
     let txns = (window.ALL_TXN || []).filter(t => parseMonthKey(t.d) === key);
+    if (monthCatFilter) {
+      txns = txns.filter(t => t.cat === monthCatFilter);
+    }
     if (monthSearch) {
       const sv = monthSearch.toLowerCase();
       txns = txns.filter(t => t.desc.toLowerCase().includes(sv) || t.cat.toLowerCase().includes(sv) || String(t.amt).includes(sv));
@@ -1979,8 +2060,8 @@ function updateMetrics() {
           + '</div>';
       }).join('');
     }
-    if (monthlyPanelCount) monthlyPanelCount.textContent = monthSearch
-      ? 'Showing ' + sorted.length + ' of ' + txns.length + ' transactions'
+    if (monthlyPanelCount) monthlyPanelCount.textContent = (monthSearch || monthCatFilter)
+      ? 'Showing ' + sorted.length + ' of ' + (window.ALL_TXN || []).filter(t => parseMonthKey(t.d) === key).length + ' transactions'
       : 'Showing all ' + txns.length + ' transactions';
   }
 
@@ -1998,6 +2079,10 @@ function updateMetrics() {
   });
   if (monthlyPanelSearch) monthlyPanelSearch.addEventListener('input', () => {
     monthSearch = monthlyPanelSearch.value.trim();
+    if (activeMonthKey) renderMonthPanel();
+  });
+  if (monthlyPanelCatFilter) monthlyPanelCatFilter.addEventListener('change', () => {
+    monthCatFilter = monthlyPanelCatFilter.value;
     if (activeMonthKey) renderMonthPanel();
   });
 
@@ -2246,17 +2331,17 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
 
   // ── Category keyword rules ───────────────────────────────────
   const CAT_RULES = [
-    { cat: 'Groceries & supermarkets', keys: ['woolworths','coles','aldi','costco','foodness','asian market','daily mart','kfl supermarket','sao sang','yuchens','kfl ','breadtop','bakers delight','colonial fruit','melb asian','melb onstreet','why sweet','xiangbalao','koreast','whitehorse road liquor','palgong','happy mart','hu hui','bakers','woolies'] },
-    { cat: 'Dining & takeaway',        keys: ['hunan','momo tea','jiangnan','cafe','restaurant','noodle','dumpling','kitchen','pizza','kfc','mcdonalds','mcdonald','eatery','takeway','ramen','sushi','pho','banh mi','dining','food group','tasty house','cafe sigma','cwh forest','daniel','golden noodle','rainbowtown','zonzo','farmhouse','fragrant','peking','dooboo','secret kitchen','top tea','uncle tetsu','heytea','gotcha','roll d','bay city','sober ramen','ichimi','liangs','infuse mw','sing jill','hong kong asian','bon cafe','top fun','eastwood eatery','boost juice','hungry jack','domino','subway','the sober','harbour cafe'] },
-    { cat: 'Hardware & home',          keys: ['bunnings','ikea','mycar','bbq revolution','peppy planet','bed bath','boronia car','harris scarfe','spotlight','temple & webster','spotlight'] },
-    { cat: 'Utilities & bills',        keys: ['globird','superloop','bpay','club lime','amaysim','optus','wooliesmobile','yarravalleywater','centrelink','viva leisure','onepass','tangerine telecom','budget','tax office','whitehorse city','deft payments','rates','electricity','water','council','energy'] },
+    { cat: 'Groceries & supermarkets', keys: ['woolworths','coles','aldi','costco','foodness','asian market','daily mart','kfl supermarket','sao sang','yuchens','kfl ','breadtop','bakers delight','colonial fruit','melb asian','melb onstreet','why sweet','xiangbalao','koreast','whitehorse road liquor','palgong','happy mart','hu hui','bakers','woolies','supermarket','hong kong asian food'] },
+    { cat: 'Dining & takeaway',        keys: ['hunan','momo tea','jiangnan','cafe','restaurant','noodle','dumpling','kitchen','pizza','kfc','mcdonalds','mcdonald','eatery','takeway','ramen','sushi','pho','banh mi','dining','food group','tasty house','cafe sigma','cwh forest','daniel','golden noodle','rainbowtown','zonzo','farmhouse','fragrant','peking','dooboo','secret kitchen','top tea','uncle tetsu','heytea','gotcha','roll d','bay city','sober ramen','ichimi','liangs','infuse mw','hong kong asian','bon cafe','top fun','eastwood eatery','boost juice','hungry jack','domino','subway','the sober','harbour cafe','foodie','1919 master','hungrypanda','silk road','hotpot','lanzhou','hong kong central','bang bang bar','kinn','ichiro','rombe','nishiki','tai trinh'] },
+    { cat: 'Hardware & home',          keys: ['bunnings','ikea','bbq revolution','peppy planet','bed bath','boronia car','harris scarfe','spotlight','temple & webster','spotlight'] },
+    { cat: 'Utilities & bills',        keys: ['globird','superloop','bpay','club lime','amaysim','optus','wooliesmobile','yarravalleywater','centrelink','viva leisure','onepass','tangerine telecom','budget','tax office','whitehorse city','deft payments','rates','electricity','water corp','water bill','south east water','yarra valley water','council','energy'] },
     { cat: 'Travel & accommodation',   keys: ['booking.com','big4','ingenia','portland bay','phillip island','skybus','myki','trip.com','searoad','hotel','flight','accommodation','holiday park','airbnb','uber','airport'] },
     { cat: 'Electronics & online',     keys: ['xiaomi','jb hi-fi','appliances online','bing lee','harvey norman','paypal *pypl','ergopouch','mobileciti','adidas','shark clean','koala au','sp lskd','amazon','officeworks','sp jb'] },
     { cat: 'Online shopping',          keys: ['shopback','ebay','aliexpress','taobao','sp suma','temple & webster'] },
     { cat: 'Department stores',        keys: ['kmart','target','big w','harris scarfe','myer','david jones','tk maxx','rebel'] },
-    { cat: 'Fuel',                     keys: ['reddy express','shell reddy','bp ','ampol','caltex','7-eleven','liberty fuel','fuel'] },
-    { cat: 'Entertainment & activities', keys: ['zoo','bowlimg','bowling','zone bowling','moonlit','mopa','hoyts','cinema','movie','sea life','aquarium','museum','amusement','galberry','rides4fun','barrabool','bayside city council','blue hills','christmas wonderland','studley park','solo lysterfield','point leo','slinkycat','city of casey myuna','crocs playcentre','portland cable'] },
-    { cat: 'Health & insurance',       keys: ['chemist','pharmacy','pline pharm','dental','medical','doctor','budget direct','insurance','health','myhealth','chemistwarehouse','priceline','cw box'] },
+    { cat: 'Car & Fuel',                keys: ['reddy express','shell reddy','bp ','ampol','caltex','7-eleven','liberty fuel','fuel','mycar'] },
+    { cat: 'Entertainment & activities', keys: ['zoo','bowlimg','bowling','zone bowling','moonlit','mopa','hoyts','cinema','movie','sea life','aquarium','museum','amusement','galberry','rides4fun','barrabool','bayside city council','blue hills','christmas wonderland','studley park','solo lysterfield','point leo','slinkycat','city of casey myuna','crocs playcentre','portland cable','timezone','gumnuts','playland','big goose'] },
+    { cat: 'Health & insurance',       keys: ['chemist','pharmacy','pline pharm','dental','medical','doctor','budget direct','insurance','health','myhealth','chemistwarehouse','priceline','cw box','bodybalance','b yself','denta','medicin','acuway','sing jill'] },
     { cat: 'Gifts & toys',             keys: ['toymate','toyworld','daiso','gifts','jiali','rotary club','emall','toys mart','top cloud','koko black','le petit','oz best gift','cbd world gift','inner west swedish','sunny creek','catkin grove','newhope','slink','warrandyte'] },
     { cat: 'Clothing & lifestyle',     keys: ['aesop','endota','uniqlo','bonds','bcf','anaconda','best & less','muji','le creuset','99 bikes','decathlon','lskd','boost accessories','cotton on','sport'] },
     { cat: 'Parking & fees',           keys: ['parking','wilson parking','westfield knox','point parking','melb onstreet'] },
@@ -2549,7 +2634,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       'Electronics & online': '#2d7dd2',
       'Online shopping': '#00876c',
       'Department stores': '#c44020',
-      'Fuel': '#5138a8',
+      'Car & Fuel': '#5138a8',
       'Entertainment & activities': '#f4a300',
       'Health & insurance': '#e63946',
       'Other': '#888888',
@@ -2699,7 +2784,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       'Utilities & bills': 'Review recurring subscriptions and compare energy providers for better-value plans.',
       'Hardware & home': 'Batch purchases to reduce impulse spending and consider trade accounts for volume discounts.',
       'Dining & takeaway': 'Set a weekly dining cap and cook more meals at home to reduce takeaway costs.',
-      'Fuel': 'Consolidate to supermarket-linked fuel stations for loyalty discounts.',
+      'Car & Fuel': 'Consolidate to supermarket-linked fuel stations for loyalty discounts.',
       'Online shopping': 'Use price trackers and set purchase waiting periods to reduce impulse buys.',
       'Entertainment & activities': 'Look for family memberships or annual passes to reduce per-visit costs.',
       'Groceries & supermarkets': 'Plan weekly meals and use loyalty programs to maximise savings.',
@@ -3019,7 +3104,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
         uploadBanner.classList.remove('processing');
         setStatus(`✓ Report generated from ${txns.length} transactions (${skipped} rows skipped)`, false);
         // Update import button label
-        document.getElementById('btnOpenUpload').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg> Re-import data';
+        document.getElementById('btnOpenUpload').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg><span>Re-import data</span>';
         // Close popup after a short delay so user sees the success message
         setTimeout(() => closeUploadPopup(), 1400);
       }, 300);
