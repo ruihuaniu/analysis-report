@@ -1062,11 +1062,16 @@
     white-space: nowrap;
     flex-shrink: 0;
   }
-  #btnOpenUpload {
+  #btnOpenUpload, #btnLangToggle {
     background: var(--paper2);
     border: 1px solid var(--paper3);
     color: var(--ink2);
     transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  #btnLangToggle:hover {
+    background: var(--paper3);
+    border-color: var(--ink3);
+    color: var(--ink);
   }
   #btnDownloadHtml {
     background: var(--ink);
@@ -1188,7 +1193,7 @@
 
   <!-- Hero -->
   <header class="hero animate d1">
-    <div class="hero-badge">Statement Analysis</div>
+    <div class="hero-badge" data-i18n="hero_badge">Statement Analysis</div>
     <h1>Transaction<br><em>Analysis</em> Report</h1>
     <div class="hero-meta">
       <span id="heroPeriod">Period: —</span>
@@ -1196,13 +1201,17 @@
       <span id="heroSource">—</span>
     </div>
     <div class="hero-actions">
+      <button id="btnLangToggle" title="Switch language / 切换语言" aria-label="Switch language">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.8 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.8-3.8-9s1.3-6.5 3.8-9Z" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span id="btnLangToggleLabel">中文</span>
+      </button>
       <button id="btnOpenUpload" title="Import your own data" aria-label="Import transaction data">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 16V8m0 0L9 11m3-3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="1.8"/></svg>
-        <span>Import data</span>
+        <span data-i18n="btn_import">Import data</span>
       </button>
       <button id="btnDownloadHtml" title="Download a self-contained HTML file with this data baked in" aria-label="Download shareable HTML">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M12 4v12m0 0-4-4m4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 18v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <span>Download HTML</span>
+        <span data-i18n="btn_download">Download HTML</span>
       </button>
     </div>
     <div class="hero-accent"></div>
@@ -1212,7 +1221,7 @@
   <section class="section animate d2">
     <div class="section-header">
       <span class="section-num">01</span>
-      <h2 class="section-title">Summary</h2>
+      <h2 class="section-title" data-i18n="sec_summary">Summary</h2>
       <div class="section-divider"></div>
     </div>
     <div class="metrics">
@@ -1243,12 +1252,12 @@
   <section class="section animate d3">
     <div class="section-header">
       <span class="section-num">02</span>
-      <h2 class="section-title">Monthly Spending</h2>
+      <h2 class="section-title" data-i18n="sec_monthly">Monthly Spending</h2>
       <div class="section-divider"></div>
     </div>
     <div class="chart-card" style="padding-bottom:0;overflow:hidden;">
       <div style="padding:0 0 16px;">
-        <div class="chart-label">Withdrawals by month</div>
+        <div class="chart-label" data-i18n="lbl_withdrawals">Withdrawals by month</div>
         <div class="chart-title" id="monthlyChartTitle">Monthly spending</div>
         <div class="chart-desc" id="monthlyChartDesc" style="margin-bottom:0"></div>
       </div>
@@ -1264,14 +1273,14 @@
           </div>
           <div class="txn-panel-toolbar-right">
             <div class="detail-sort-group">
-              <span class="detail-sort-label">Sort:</span>
-              <button class="detail-sort-btn active" data-mmsort="date">Date</button>
+              <span class="detail-sort-label" data-i18n="lbl_sort">Sort:</span>
+              <button class="detail-sort-btn active" data-mmsort="date" data-i18n="btn_date">Date</button>
               <button class="detail-sort-btn" data-mmsort="asc">$ ↑</button>
               <button class="detail-sort-btn" data-mmsort="desc">$ ↓</button>
             </div>
-            <input class="txn-search" type="text" placeholder="Search…" id="monthlyPanelSearch">
+            <input class="txn-search" type="text" placeholder="Search…" data-i18n-ph="ph_search" id="monthlyPanelSearch">
             <select class="txn-search" id="monthlyPanelCatFilter" style="cursor:pointer;">
-              <option value="">All categories</option>
+              <option value="" data-i18n="opt_all_categories">All categories</option>
             </select>
             <button class="btn-collapse" id="btnMonthlyCollapse" title="Close" aria-label="Close month panel">✕</button>
           </div>
@@ -1282,8 +1291,8 @@
     </div>
 
     <div class="chart-card">
-      <div class="chart-label">Trend</div>
-      <div class="chart-title">Seasonal spending pattern</div>
+      <div class="chart-label" data-i18n="lbl_trend">Trend</div>
+      <div class="chart-title" data-i18n="title_seasonal">Seasonal spending pattern</div>
       <div class="chart-desc">Spending climbs from mid-2025 through a pronounced Oct–Dec 2025 holiday peak, dips in Jan and Mar 2026, then surges again in Feb 2026 (large bills). Spending normalises to ~$2,400–$3,400/month outside peak periods.</div>
       <div style="position:relative;height:160px;">
         <canvas id="trendChart" role="img" aria-label="Line chart of spending trend over 12 months"></canvas>
@@ -1295,13 +1304,13 @@
   <section class="section animate d4">
     <div class="section-header">
       <span class="section-num">03</span>
-      <h2 class="section-title">Spending by Category</h2>
+      <h2 class="section-title" data-i18n="sec_category">Spending by Category</h2>
       <div class="section-divider"></div>
     </div>
 
     <!-- Donut chart row -->
     <div class="chart-card" style="margin-bottom:20px;">
-      <div class="chart-label">Distribution</div>
+      <div class="chart-label" data-i18n="lbl_distribution">Distribution</div>
       <div class="chart-title" id="donutChartTitle">Top spending categories</div>
       <div class="donut-row">
         <div class="donut-canvas-wrap">
@@ -1323,8 +1332,8 @@
     <div class="chart-card breakdown-card">
       <div class="breakdown-header">
         <div>
-          <div class="chart-label">Breakdown table</div>
-          <div class="chart-title" style="margin-bottom:0">All categories</div>
+          <div class="chart-label" data-i18n="lbl_breakdown">Breakdown table</div>
+          <div class="chart-title" data-i18n="title_all_categories" style="margin-bottom:0">All categories</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3);">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="6" stroke="#8a8680" stroke-width="1"/><path d="M6.5 5.5v4M6.5 4h.01" stroke="#8a8680" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -1340,12 +1349,12 @@
               <tr>
                 <th>
                   <button class="sort-btn active" data-col="name" data-dir="asc" title="Sort by category name">
-                    Category <span class="sort-icon">↕</span>
+                    <span data-i18n="col_category">Category</span> <span class="sort-icon">↕</span>
                   </button>
                 </th>
                 <th style="text-align:right;width:110px">
                   <button class="sort-btn" data-col="val" data-dir="desc" title="Sort by spend amount">
-                    Spend <span class="sort-icon">↕</span>
+                    <span data-i18n="col_spend">Spend</span> <span class="sort-icon">↕</span>
                   </button>
                 </th>
                 <th style="text-align:right;width:48px">
@@ -1375,12 +1384,12 @@
               </div>
               <div class="txn-panel-toolbar-right">
                 <div class="detail-sort-group">
-                  <span class="detail-sort-label">Sort:</span>
-                  <button class="detail-sort-btn active" data-sort="date" title="Sort by date">Date</button>
+                  <span class="detail-sort-label" data-i18n="lbl_sort">Sort:</span>
+                  <button class="detail-sort-btn active" data-sort="date" title="Sort by date" data-i18n="btn_date">Date</button>
                   <button class="detail-sort-btn" data-sort="asc" title="Amount low → high">$ ↑</button>
                   <button class="detail-sort-btn" data-sort="desc" title="Amount high → low">$ ↓</button>
                 </div>
-                <input class="txn-search" type="text" placeholder="Search…" id="txnPanelSearch">
+                <input class="txn-search" type="text" placeholder="Search…" data-i18n-ph="ph_search" id="txnPanelSearch">
                 <button class="btn-collapse" id="btnCollapse" title="Collapse panel" aria-label="Collapse transaction panel">✕</button>
               </div>
             </div>
@@ -1396,11 +1405,11 @@
   <section class="section animate d5">
     <div class="section-header">
       <span class="section-num">04</span>
-      <h2 class="section-title">Top Merchants</h2>
+      <h2 class="section-title" data-i18n="sec_merchants">Top Merchants</h2>
       <div class="section-divider"></div>
     </div>
     <div class="chart-card">
-      <div class="chart-label">By total spend</div>
+      <div class="chart-label" data-i18n="lbl_by_total_spend">By total spend</div>
       <div class="chart-title" id="merchantChartTitle">Top merchants by spend</div>
       <div style="position:relative;height:420px;">
         <canvas id="merchantChart" role="img" aria-label="Horizontal bar chart of top merchants by spend"></canvas>
@@ -1409,8 +1418,8 @@
     <div class="chart-card" style="margin-top:0;padding:0;overflow:visible;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;">
         <div>
-          <div class="chart-label">Merchant detail</div>
-          <div class="chart-title" style="margin-bottom:0">All top merchants</div>
+          <div class="chart-label" data-i18n="lbl_merchant_detail">Merchant detail</div>
+          <div class="chart-title" data-i18n="title_all_merchants" style="margin-bottom:0">All top merchants</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3);">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="6" stroke="#8a8680" stroke-width="1"/><path d="M6.5 5.5v4M6.5 4h.01" stroke="#8a8680" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -1422,17 +1431,17 @@
           <div class="merchant-toolbar">
             <div class="merchant-search-wrap">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4.5" stroke="#8a8680" stroke-width="1.2"/><path d="M9 9l2.5 2.5" stroke="#8a8680" stroke-width="1.2" stroke-linecap="round"/></svg>
-              <input class="merchant-search" type="text" placeholder="Filter merchants…" id="merchantTableSearch">
+              <input class="merchant-search" type="text" placeholder="Filter merchants…" data-i18n-ph="ph_filter_merchants" id="merchantTableSearch">
             </div>
             <span class="merchant-count-label" id="merchantCountLabel"></span>
           </div>
           <table class="data-table">
             <thead>
               <tr>
-                <th class="sortable active" data-mtcol="name" data-mtdir="asc" style="cursor:pointer">Merchant <span class="th-sort-icon">↑</span></th>
-                <th class="sortable" data-mtcol="cat" data-mtdir="asc" style="cursor:pointer">Category <span class="th-sort-icon">↕</span></th>
-                <th class="sortable" data-mtcol="spend" data-mtdir="desc" style="text-align:right;cursor:pointer">Total Spend <span class="th-sort-icon">↕</span></th>
-                <th class="sortable" data-mtcol="visits" data-mtdir="desc" style="text-align:right;cursor:pointer">Visits <span class="th-sort-icon">↕</span></th>
+                <th class="sortable active" data-mtcol="name" data-mtdir="asc" style="cursor:pointer"><span data-i18n="col_merchant">Merchant</span> <span class="th-sort-icon">↑</span></th>
+                <th class="sortable" data-mtcol="cat" data-mtdir="asc" style="cursor:pointer"><span data-i18n="col_category">Category</span> <span class="th-sort-icon">↕</span></th>
+                <th class="sortable" data-mtcol="spend" data-mtdir="desc" style="text-align:right;cursor:pointer"><span data-i18n="col_total_spend">Total Spend</span> <span class="th-sort-icon">↕</span></th>
+                <th class="sortable" data-mtcol="visits" data-mtdir="desc" style="text-align:right;cursor:pointer"><span data-i18n="col_visits">Visits</span> <span class="th-sort-icon">↕</span></th>
                 <th style="width:28px"></th>
               </tr>
             </thead>
@@ -1450,12 +1459,12 @@
               </div>
               <div class="txn-panel-toolbar-right">
                 <div class="detail-sort-group">
-                  <span class="detail-sort-label">Sort:</span>
-                  <button class="detail-sort-btn active" data-msort="date">Date</button>
+                  <span class="detail-sort-label" data-i18n="lbl_sort">Sort:</span>
+                  <button class="detail-sort-btn active" data-msort="date" data-i18n="btn_date">Date</button>
                   <button class="detail-sort-btn" data-msort="asc">$ ↑</button>
                   <button class="detail-sort-btn" data-msort="desc">$ ↓</button>
                 </div>
-                <input class="txn-search" type="text" placeholder="Search…" id="merchantPanelSearch">
+                <input class="txn-search" type="text" placeholder="Search…" data-i18n-ph="ph_search" id="merchantPanelSearch">
                 <button class="btn-collapse" id="btnMerchantCollapse" title="Collapse panel" aria-label="Collapse merchant panel">✕</button>
               </div>
             </div>
@@ -1471,7 +1480,7 @@
   <section class="section animate d6">
     <div class="section-header">
       <span class="section-num">05</span>
-      <h2 class="section-title">Key Observations</h2>
+      <h2 class="section-title" data-i18n="sec_observations">Key Observations</h2>
       <div class="section-divider"></div>
     </div>
     <div class="obs-grid" id="obsGrid">
@@ -1483,7 +1492,7 @@
   <section class="section">
     <div class="section-header">
       <span class="section-num">06</span>
-      <h2 class="section-title">Areas to Review</h2>
+      <h2 class="section-title" data-i18n="sec_review">Areas to Review</h2>
       <div class="section-divider"></div>
     </div>
     <div class="rec-list" id="recList">
@@ -1500,6 +1509,68 @@
 </div><!-- end #dashboard -->
 
 <script>
+// ── i18n ────────────────────────────────────────────────────────────
+const I18N = {
+  hero_badge:          { en: 'Statement Analysis',        zh: '账单分析' },
+  btn_import:          { en: 'Import data',                zh: '导入数据' },
+  btn_download:        { en: 'Download HTML',              zh: '下载 HTML' },
+  sec_summary:         { en: 'Summary',                    zh: '概览' },
+  sec_monthly:         { en: 'Monthly Spending',           zh: '月度支出' },
+  sec_category:        { en: 'Spending by Category',       zh: '分类支出' },
+  sec_merchants:       { en: 'Top Merchants',              zh: '主要商户' },
+  sec_observations:    { en: 'Key Observations',           zh: '关键观察' },
+  sec_review:          { en: 'Areas to Review',            zh: '需要关注' },
+  lbl_withdrawals:     { en: 'Withdrawals by month',       zh: '按月支出' },
+  lbl_trend:           { en: 'Trend',                      zh: '趋势' },
+  title_seasonal:      { en: 'Seasonal spending pattern',  zh: '季节性支出模式' },
+  lbl_distribution:    { en: 'Distribution',                zh: '占比分布' },
+  lbl_breakdown:       { en: 'Breakdown table',             zh: '明细表' },
+  title_all_categories:{ en: 'All categories',              zh: '所有类别' },
+  lbl_by_total_spend:  { en: 'By total spend',              zh: '按总支出' },
+  lbl_merchant_detail: { en: 'Merchant detail',             zh: '商户明细' },
+  title_all_merchants: { en: 'All top merchants',           zh: '所有主要商户' },
+  ph_search:           { en: 'Search…',                     zh: '搜索…' },
+  ph_filter_merchants: { en: 'Filter merchants…',           zh: '筛选商户…' },
+  opt_all_categories:  { en: 'All categories',              zh: '所有类别' },
+  lbl_sort:            { en: 'Sort:',                       zh: '排序：' },
+  btn_date:            { en: 'Date',                        zh: '日期' },
+  col_category:        { en: 'Category',                    zh: '类别' },
+  col_spend:           { en: 'Spend',                       zh: '支出' },
+  col_merchant:        { en: 'Merchant',                    zh: '商户' },
+  col_total_spend:     { en: 'Total Spend',                 zh: '总支出' },
+  col_visits:          { en: 'Visits',                      zh: '次数' },
+};
+let CURRENT_LANG = (function () {
+  try { return localStorage.getItem('txr_lang') || 'en'; } catch (e) { return 'en'; }
+})();
+function t(key) {
+  const entry = I18N[key];
+  if (!entry) return key;
+  return entry[CURRENT_LANG] || entry.en;
+}
+function applyI18n() {
+  document.documentElement.lang = CURRENT_LANG === 'zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  const langLabel = document.getElementById('btnLangToggleLabel');
+  if (langLabel) langLabel.textContent = CURRENT_LANG === 'zh' ? 'EN' : '中文';
+}
+document.addEventListener('DOMContentLoaded', function () {
+  applyI18n();
+  const langBtn = document.getElementById('btnLangToggle');
+  if (langBtn) {
+    langBtn.addEventListener('click', function () {
+      CURRENT_LANG = CURRENT_LANG === 'zh' ? 'en' : 'zh';
+      try { localStorage.setItem('txr_lang', CURRENT_LANG); } catch (e) {}
+      applyI18n();
+    });
+  }
+});
+
 // ── Data — populated by CSV upload ──────────────────────────────────
 let TOTAL_SPEND = 0;
 let TOTAL_CREDIT = 0;
@@ -2020,7 +2091,7 @@ function updateMetrics() {
       spendByCat[t.cat] = (spendByCat[t.cat] || 0) + t.amt;
     });
     const cats = Object.keys(spendByCat).sort((a,b) => spendByCat[b] - spendByCat[a]);
-    monthlyPanelCatFilter.innerHTML = '<option value="">All categories</option>'
+    monthlyPanelCatFilter.innerHTML = '<option value="">' + t('opt_all_categories') + '</option>'
       + cats.map(c => '<option value="' + c.replace(/"/g,'&quot;') + '">' + c + '</option>').join('');
   }
 
@@ -2331,8 +2402,8 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
 
   // ── Category keyword rules ───────────────────────────────────
   const CAT_RULES = [
-    { cat: 'Groceries & supermarkets', keys: ['woolworths','coles','aldi','costco','foodness','asian market','daily mart','kfl supermarket','sao sang','yuchens','kfl ','breadtop','bakers delight','colonial fruit','melb asian','melb onstreet','why sweet','xiangbalao','koreast','whitehorse road liquor','palgong','happy mart','hu hui','bakers','woolies','supermarket','hong kong asian food','hatter and hare','little saigon','little claypo','letao','sysy bread','golden pots'] },
-    { cat: 'Dining & takeaway',        keys: ['hunan','momo tea','jiangnan','cafe','restaurant','noodle','dumpling','kitchen','pizza','kfc','mcdonalds','mcdonald','eatery','takeway','ramen','sushi','pho','banh mi','dining','food group','tasty house','cafe sigma','cwh forest','daniel','golden noodle','rainbowtown','zonzo','farmhouse','fragrant','peking','dooboo','secret kitchen','top tea','uncle tetsu','heytea','gotcha','roll d','bay city','sober ramen','ichimi','liangs','infuse mw','hong kong asian','bon cafe','top fun','eastwood eatery','boost juice','hungry jack','domino','subway','the sober','harbour cafe','foodie','1919 master','hungrypanda','silk road','hotpot','lanzhou','hong kong central','bang bang bar','kinn','ichiro','rombe','nishiki','tai trinh'] },
+    { cat: 'Groceries & supermarkets', keys: ['woolworths','coles','aldi','costco','foodness','asian market','daily mart','kfl supermarket','sao sang','yuchens','kfl ','breadtop','bakers delight','colonial fruit','melb asian','melb onstreet','why sweet','xiangbalao','koreast','whitehorse road liquor','palgong','happy mart','hu hui','bakers','woolies','supermarket','hong kong asian food'] },
+    { cat: 'Dining & takeaway',        keys: ['hunan','momo tea','jiangnan','cafe','restaurant','noodle','dumpling','kitchen','pizza','kfc','mcdonalds','mcdonald','eatery','takeway','ramen','sushi','pho','banh mi','dining','food group','tasty house','cafe sigma','cwh forest','daniel','golden noodle','rainbowtown','zonzo','farmhouse','fragrant','peking','dooboo','secret kitchen','top tea','uncle tetsu','heytea','gotcha','roll d','bay city','sober ramen','ichimi','liangs','infuse mw','hong kong asian','bon cafe','top fun','eastwood eatery','boost juice','hungry jack','domino','subway','the sober','harbour cafe','foodie','1919 master','hungrypanda','silk road','hotpot','lanzhou','hong kong central','bang bang bar','kinn','ichiro','rombe','nishiki','tai trinh','hatter and hare','little saigon','little claypo','letao','sysy bread','golden pots'] },
     { cat: 'Hardware & home',          keys: ['bunnings','ikea','bbq revolution','peppy planet','bed bath','boronia car','harris scarfe','spotlight','temple & webster','spotlight'] },
     { cat: 'Utilities & bills',        keys: ['globird','superloop','bpay','club lime','amaysim','optus','wooliesmobile','yarravalleywater','centrelink','viva leisure','onepass','tangerine telecom','budget','tax office','whitehorse city','deft payments','rates','electricity','water corp','water bill','south east water','yarra valley water','council','energy'] },
     { cat: 'Travel & accommodation',   keys: ['booking.com','big4','ingenia','portland bay','phillip island','skybus','myki','trip.com','searoad','hotel','flight','accommodation','holiday park','airbnb','uber','airport','public transport'] },
