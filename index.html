@@ -1592,6 +1592,10 @@ const I18N = {
   title_sort_pct:        { en: 'Sort by percentage',            zh: '按百分比排序' },
   hint_click_row_expand: { en: 'Click a row to expand transactions', zh: '点击一行以展开交易记录' },
   hint_click_row_see:    { en: 'Click a row to see transactions',    zh: '点击一行以查看交易记录' },
+  word_txns_short:      { en: 'txns',   zh: '笔交易' },
+  word_txn_short:       { en: 'txn',    zh: '笔交易' },
+  word_total_short:     { en: 'total',  zh: '总计' },
+  word_avg_short:       { en: 'avg',    zh: '平均' },
   obs_top_cat_title:    { en: 'Top category: {cat}',            zh: '最大类别：{cat}' },
   obs_top_cat_body:     { en: '{cat} is your largest spending category at {amt}, representing {pct}% of total spend.', zh: '{cat}是您支出最多的类别，共 {amt}，占总支出的 {pct}%。' },
   obs_top_merchant_title:{ en: 'Top merchant: {name}',          zh: '主要商户：{name}' },
@@ -1664,6 +1668,20 @@ function fmtDateDisplay(dStr) {
   const mi = MONTH_ABBR_EN.indexOf(mon);
   if (mi === -1) return dStr;
   return `${year}年${mi + 1}月${parseInt(day, 10)}日`;
+}
+function fmtMonthKeyDisplay(mk) {
+  // mk is always stored as "Mon YY" (e.g. "Jan 25") regardless of language,
+  // since it's also used as a data key for month lookups/matching. This
+  // reformats it for display only (chart axis labels), without touching
+  // the underlying key used elsewhere.
+  if (!mk) return mk;
+  if (CURRENT_LANG !== 'zh') return mk;
+  const parts = mk.split(' ');
+  if (parts.length !== 2) return mk;
+  const [mon, yy] = parts;
+  const mi = MONTH_ABBR_EN.indexOf(mon);
+  if (mi === -1) return mk;
+  return `${yy}年${mi + 1}月`;
 }
 function applyI18n() {
   document.documentElement.lang = CURRENT_LANG === 'zh' ? 'zh-CN' : 'en';
@@ -1935,7 +1953,7 @@ function populateCatPanel(c) {
 
   panelCat.textContent   = catName(c.name);
   panelStats.textContent =
-    `${txns.length} txns · $${txnTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} total · avg $${avg.toFixed(2)}`;
+    `${txns.length} ${txns.length !== 1 ? t('word_txns_short') : t('word_txn_short')} · $${txnTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ${t('word_total_short')} · ${t('word_avg_short')} $${avg.toFixed(2)}`;
   panelSearch.value = '';
 
   renderTxnList(txns, '');
@@ -2350,7 +2368,7 @@ function updateMetrics() {
 
   new Chart(document.getElementById('monthlyChart'), {
     type: 'bar',
-    data: { labels: MONTHS, datasets },
+    data: { labels: MONTHS.map(fmtMonthKeyDisplay), datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
@@ -2387,7 +2405,7 @@ function updateMetrics() {
   new Chart(document.getElementById('trendChart'), {
     type: 'line',
     data: {
-      labels: MONTHS,
+      labels: MONTHS.map(fmtMonthKeyDisplay),
       datasets: [
         {
           label: 'Monthly spend',
@@ -3079,7 +3097,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       new Chart(barCtx, {
         type: 'bar',
         data: {
-          labels: months,
+          labels: months.map(fmtMonthKeyDisplay),
           datasets: cats.map(c => ({
             label: catName(c.name),
             data: monthlyByCat[c.name] || months.map(()=>0),
@@ -3128,7 +3146,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       new Chart(trendCtx, {
         type: 'line',
         data: {
-          labels: months,
+          labels: months.map(fmtMonthKeyDisplay),
           datasets: [
             { label: 'Monthly spend', data: spend, borderColor: '#1e5fa8', backgroundColor: 'rgba(30,95,168,0.07)', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#1e5fa8', fill: true, tension: 0.35, order: 2 },
             { label: '3-month avg', data: ma3r, borderColor: '#b85c00', backgroundColor: 'transparent', fill: false, tension: 0.4, pointRadius: 0, borderWidth: 2.5, borderDash: [5, 4], spanGaps: true, order: 1 }
@@ -3602,7 +3620,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     if (merchantDetailSort === 'date') sorted.sort((a,b) => parseDateObj2(b.d) - parseDateObj2(a.d));
     const total = filtered.reduce((s,t) => s + t.amt, 0);
     merchantPanelCat.textContent = name;
-    merchantPanelStats.textContent = filtered.length + ' txn' + (filtered.length !== 1 ? 's' : '') +
+    merchantPanelStats.textContent = filtered.length + ' ' + (filtered.length !== 1 ? t('word_txns_short') : t('word_txn_short')) +
       '  ·  $' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     merchantPanelList.innerHTML = sorted.map(t =>
       '<div class="txn-item">' +
