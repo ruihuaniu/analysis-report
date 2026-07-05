@@ -1133,7 +1133,7 @@
             <div class="upload-sub" style="font-size:12px;color:var(--ink3);font-family:'DM Mono',monospace;">CSV or Excel (.xlsx / .xls)</div>
           </div>
         </div>
-        <button id="uploadPopupClose" style="background:none;border:none;cursor:pointer;color:var(--ink3);font-size:18px;padding:2px 4px;line-height:1;border-radius:4px;transition:color 0.12s;" title="Close">✕</button>
+        <button id="uploadPopupClose" style="background:none;border:none;cursor:pointer;color:var(--ink3);font-size:18px;padding:2px 4px;line-height:1;border-radius:4px;transition:color 0.12s;" title="Close" data-i18n-title="lbl_close">✕</button>
       </div>
 
       <!-- Drop zone -->
@@ -1159,8 +1159,8 @@
       <div class="modal-sample" id="modalSample"></div>
       <div id="fieldRows"></div>
       <div class="modal-actions">
-        <button class="upload-btn secondary" id="modalCancel">Cancel</button>
-        <button class="upload-btn" id="modalConfirm">Generate report</button>
+        <button class="upload-btn secondary" id="modalCancel" data-i18n="btn_cancel">Cancel</button>
+        <button class="upload-btn" id="modalConfirm" data-i18n="btn_generate_report">Generate report</button>
       </div>
     </div>
   </div>
@@ -1168,22 +1168,22 @@
   <!-- Upload screen (shown by default) -->
   <div id="uploadScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;">
     <div style="max-width:480px;width:100%;text-align:center;">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:20px;">Transaction Analysis</div>
-      <h1 style="font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,52px);line-height:1.08;font-weight:400;color:var(--ink);margin-bottom:16px;">Upload your<br><em style="font-style:italic;color:var(--blue);">bank statement</em></h1>
-      <p style="font-size:14px;color:var(--ink3);margin-bottom:36px;line-height:1.6;">Export a CSV from your bank's internet banking, then drop it here to generate your personal spending analysis.</p>
+      <div data-i18n="upload_eyebrow" style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:20px;">Transaction Analysis</div>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,52px);line-height:1.08;font-weight:400;color:var(--ink);margin-bottom:16px;"><span data-i18n="upload_h1_line1">Upload your</span><br><em style="font-style:italic;color:var(--blue);" data-i18n="upload_h1_line2">bank statement</em></h1>
+      <p data-i18n="upload_intro" style="font-size:14px;color:var(--ink3);margin-bottom:36px;line-height:1.6;">Export a CSV from your bank's internet banking, then drop it here to generate your personal spending analysis.</p>
       <label id="uploadZone" style="display:block;border:2px dashed var(--paper3);border-radius:12px;padding:40px 24px;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--paper2);">
         <input type="file" id="csvFileInput" accept=".csv,.xlsx,.xls" style="display:none;">
         <div style="font-size:36px;margin-bottom:12px;">📂</div>
-        <div style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px;">Drop CSV file here</div>
-        <div style="font-size:13px;color:var(--ink3);">or click to browse · CSV, XLS, XLSX</div>
+        <div data-i18n="drop_csv_here" style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px;">Drop CSV file here</div>
+        <div data-i18n="upload_browse_hint" style="font-size:13px;color:var(--ink3);">or click to browse · CSV, XLS, XLSX</div>
       </label>
       <div id="uploadError" style="display:none;margin-top:16px;padding:12px 16px;background:var(--coral-l);border-radius:8px;font-size:13px;color:var(--coral);"></div>
       <div id="uploadHint" style="margin-top:24px;font-size:12px;color:var(--ink3);line-height:1.6;">
-        Works with Westpac, ANZ, CommBank, NAB and most Australian bank CSV exports.<br>
-        Your data never leaves your device — everything runs in your browser.
+        <span data-i18n="upload_hint_line1">Works with Westpac, ANZ, CommBank, NAB and most Australian bank CSV exports.</span><br>
+        <span data-i18n="upload_hint_line2">Your data never leaves your device — everything runs in your browser.</span>
       </div>
       <div id="clearStorageWrap" style="display:none;margin-top:20px;">
-        <button id="btnClearStorage" style="background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--ink3);cursor:pointer;">🗑 Clear saved data</button>
+        <button id="btnClearStorage" style="background:none;border:1px solid var(--paper3);border-radius:6px;padding:6px 14px;font-size:12px;color:var(--ink3);cursor:pointer;">🗑 <span data-i18n="btn_clear_saved">Clear saved data</span></button>
       </div>
     </div>
   </div>
@@ -1226,24 +1226,24 @@
     </div>
     <div class="metrics">
       <div class="metric">
-        <div class="metric-label">Total Spent</div>
+        <div class="metric-label" data-i18n="metric_total_spent">Total Spent</div>
         <div class="metric-value" id="metTotalSpend">—</div>
         <div class="metric-sub" id="metPeriod">—</div>
       </div>
       <div class="metric">
-        <div class="metric-label">Avg Monthly</div>
+        <div class="metric-label" data-i18n="metric_avg_monthly">Avg Monthly</div>
         <div class="metric-value" id="metAvgMonthly">—</div>
         <div class="metric-sub" id="metMonths">—</div>
       </div>
       <div class="metric">
-        <div class="metric-label">Total Credits</div>
+        <div class="metric-label" data-i18n="metric_total_credits">Total Credits</div>
         <div class="metric-value" id="metTotalCredit">—</div>
-        <div class="metric-sub">payments + cashback</div>
+        <div class="metric-sub" data-i18n="metric_credits_sub">payments + cashback</div>
       </div>
       <div class="metric">
-        <div class="metric-label">Transactions</div>
+        <div class="metric-label" data-i18n="metric_transactions">Transactions</div>
         <div class="metric-value" id="metTxnCount">—</div>
-        <div class="metric-sub">debit transactions</div>
+        <div class="metric-sub" data-i18n="metric_txn_sub">debit transactions</div>
       </div>
     </div>
   </section>
@@ -1258,7 +1258,7 @@
     <div class="chart-card" style="padding-bottom:0;overflow:hidden;">
       <div style="padding:0 0 16px;">
         <div class="chart-label" data-i18n="lbl_withdrawals">Withdrawals by month</div>
-        <div class="chart-title" id="monthlyChartTitle">Monthly spending</div>
+        <div class="chart-title" id="monthlyChartTitle" data-i18n="title_monthly_default">Monthly spending</div>
         <div class="chart-desc" id="monthlyChartDesc" style="margin-bottom:0"></div>
       </div>
       <div id="monthlyLegend" class="legend" style="margin-bottom:12px;"></div>
@@ -1282,7 +1282,7 @@
             <select class="txn-search" id="monthlyPanelCatFilter" style="cursor:pointer;">
               <option value="" data-i18n="opt_all_categories">All categories</option>
             </select>
-            <button class="btn-collapse" id="btnMonthlyCollapse" title="Close" aria-label="Close month panel">✕</button>
+            <button class="btn-collapse" id="btnMonthlyCollapse" title="Close" aria-label="Close month panel" data-i18n-title="lbl_close">✕</button>
           </div>
         </div>
         <div class="txn-panel-list" id="monthlyPanelList" style="max-height:320px;overflow-y:auto;"></div>
@@ -1293,7 +1293,7 @@
     <div class="chart-card">
       <div class="chart-label" data-i18n="lbl_trend">Trend</div>
       <div class="chart-title" data-i18n="title_seasonal">Seasonal spending pattern</div>
-      <div class="chart-desc">Spending climbs from mid-2025 through a pronounced Oct–Dec 2025 holiday peak, dips in Jan and Mar 2026, then surges again in Feb 2026 (large bills). Spending normalises to ~$2,400–$3,400/month outside peak periods.</div>
+      <div class="chart-desc" data-i18n="desc_seasonal">Spending climbs from mid-2025 through a pronounced Oct–Dec 2025 holiday peak, dips in Jan and Mar 2026, then surges again in Feb 2026 (large bills). Spending normalises to ~$2,400–$3,400/month outside peak periods.</div>
       <div style="position:relative;height:160px;">
         <canvas id="trendChart" role="img" aria-label="Line chart of spending trend over 12 months"></canvas>
       </div>
@@ -1311,7 +1311,7 @@
     <!-- Donut chart row -->
     <div class="chart-card" style="margin-bottom:20px;">
       <div class="chart-label" data-i18n="lbl_distribution">Distribution</div>
-      <div class="chart-title" id="donutChartTitle">Top spending categories</div>
+      <div class="chart-title" id="donutChartTitle" data-i18n="title_donut_default">Top spending categories</div>
       <div class="donut-row">
         <div class="donut-canvas-wrap">
           <canvas id="donutChart" role="img" aria-label="Donut chart of spending categories"></canvas>
@@ -1337,7 +1337,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3);">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="6" stroke="#8a8680" stroke-width="1"/><path d="M6.5 5.5v4M6.5 4h.01" stroke="#8a8680" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Click a row to expand transactions
+          <span data-i18n="hint_click_row_expand">Click a row to expand transactions</span>
         </div>
       </div>
 
@@ -1348,17 +1348,17 @@
             <thead>
               <tr>
                 <th>
-                  <button class="sort-btn active" data-col="name" data-dir="asc" title="Sort by category name">
+                  <button class="sort-btn active" data-col="name" data-dir="asc" title="Sort by category name" data-i18n-title="title_sort_cat_name">
                     <span data-i18n="col_category">Category</span> <span class="sort-icon">↕</span>
                   </button>
                 </th>
                 <th style="text-align:right;width:110px">
-                  <button class="sort-btn" data-col="val" data-dir="desc" title="Sort by spend amount">
+                  <button class="sort-btn" data-col="val" data-dir="desc" title="Sort by spend amount" data-i18n-title="title_sort_spend">
                     <span data-i18n="col_spend">Spend</span> <span class="sort-icon">↕</span>
                   </button>
                 </th>
                 <th style="text-align:right;width:48px">
-                  <button class="sort-btn" data-col="pct" data-dir="desc" title="Sort by percentage">
+                  <button class="sort-btn" data-col="pct" data-dir="desc" title="Sort by percentage" data-i18n-title="title_sort_pct">
                     % <span class="sort-icon">↕</span>
                   </button>
                 </th>
@@ -1390,7 +1390,7 @@
                   <button class="detail-sort-btn" data-sort="desc" title="Amount high → low">$ ↓</button>
                 </div>
                 <input class="txn-search" type="text" placeholder="Search…" data-i18n-ph="ph_search" id="txnPanelSearch">
-                <button class="btn-collapse" id="btnCollapse" title="Collapse panel" aria-label="Collapse transaction panel">✕</button>
+                <button class="btn-collapse" id="btnCollapse" title="Collapse panel" aria-label="Collapse transaction panel" data-i18n-title="lbl_collapse">✕</button>
               </div>
             </div>
             <div class="txn-panel-list" id="txnPanelList"></div>
@@ -1410,7 +1410,7 @@
     </div>
     <div class="chart-card">
       <div class="chart-label" data-i18n="lbl_by_total_spend">By total spend</div>
-      <div class="chart-title" id="merchantChartTitle">Top merchants by spend</div>
+      <div class="chart-title" id="merchantChartTitle" data-i18n="title_merchant_default">Top merchants by spend</div>
       <div style="position:relative;height:420px;">
         <canvas id="merchantChart" role="img" aria-label="Horizontal bar chart of top merchants by spend"></canvas>
       </div>
@@ -1423,7 +1423,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3);">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="6" stroke="#8a8680" stroke-width="1"/><path d="M6.5 5.5v4M6.5 4h.01" stroke="#8a8680" stroke-width="1.2" stroke-linecap="round"/></svg>
-          Click a row to see transactions
+          <span data-i18n="hint_click_row_see">Click a row to see transactions</span>
         </div>
       </div>
       <div class="merchant-body" id="merchantBody">
@@ -1465,7 +1465,7 @@
                   <button class="detail-sort-btn" data-msort="desc">$ ↓</button>
                 </div>
                 <input class="txn-search" type="text" placeholder="Search…" data-i18n-ph="ph_search" id="merchantPanelSearch">
-                <button class="btn-collapse" id="btnMerchantCollapse" title="Collapse panel" aria-label="Collapse merchant panel">✕</button>
+                <button class="btn-collapse" id="btnMerchantCollapse" title="Collapse panel" aria-label="Collapse merchant panel" data-i18n-title="lbl_collapse">✕</button>
               </div>
             </div>
             <div class="txn-panel-list" id="merchantPanelList"></div>
@@ -1502,8 +1502,8 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <p id="footerLine1">Statement Analysis</p>
-    <p>Categories assigned by keyword matching · Not financial advice</p>
+    <p id="footerLine1" data-i18n="hero_badge">Statement Analysis</p>
+    <p data-i18n="footer_tagline">Categories assigned by keyword matching · Not financial advice</p>
   </footer>
 
 </div><!-- end #dashboard -->
@@ -1523,6 +1523,8 @@ const I18N = {
   lbl_withdrawals:     { en: 'Withdrawals by month',       zh: '按月支出' },
   lbl_trend:           { en: 'Trend',                      zh: '趋势' },
   title_seasonal:      { en: 'Seasonal spending pattern',  zh: '季节性支出模式' },
+  desc_seasonal:       { en: 'Spending climbs from mid-2025 through a pronounced Oct–Dec 2025 holiday peak, dips in Jan and Mar 2026, then surges again in Feb 2026 (large bills). Spending normalises to ~$2,400–$3,400/month outside peak periods.',
+                          zh: '支出从 2025 年年中开始攀升，在 2025 年 10 月至 12 月的假期高峰期达到显著峰值，随后在 2026 年 1 月和 3 月回落，并在 2026 年 2 月（大额账单）再次飙升。在高峰期以外，月支出通常在约 $2,400–$3,400 之间。' },
   lbl_distribution:    { en: 'Distribution',                zh: '占比分布' },
   lbl_breakdown:       { en: 'Breakdown table',             zh: '明细表' },
   title_all_categories:{ en: 'All categories',              zh: '所有类别' },
@@ -1539,14 +1541,129 @@ const I18N = {
   col_merchant:        { en: 'Merchant',                    zh: '商户' },
   col_total_spend:     { en: 'Total Spend',                 zh: '总支出' },
   col_visits:          { en: 'Visits',                      zh: '次数' },
+  footer_tagline:      { en: 'Categories assigned by keyword matching · Not financial advice', zh: '类别由关键词自动匹配 · 非财务建议' },
+  lbl_close:           { en: 'Close',                        zh: '关闭' },
+  lbl_collapse:        { en: 'Collapse panel',                zh: '收起面板' },
+  title_monthly_default:{ en: 'Monthly spending',             zh: '月度支出' },
+  title_donut_default: { en: 'Top spending categories',      zh: '主要支出类别' },
+  title_merchant_default:{ en: 'Top merchants by spend',      zh: '按支出排名的商户' },
+  empty_no_txns:       { en: 'No transactions recorded',     zh: '暂无交易记录' },
+  drop_csv_here:       { en: 'Drop CSV file here',            zh: '将 CSV 文件拖到此处' },
+  not_mapped:          { en: '— not mapped —',                zh: '— 未分类 —' },
+  word_transactions:   { en: 'transactions',                  zh: '笔交易' },
+  word_loaded:         { en: 'Loaded',                        zh: '已加载' },
+  word_restored:       { en: 'Restored',                      zh: '已恢复' },
+  word_saved:          { en: 'saved',                         zh: '保存于' },
+  word_baked_in:       { en: 'baked into this file',          zh: '已内置于此文件' },
+  word_showing_all:    { en: 'Showing all',                   zh: '显示全部' },
+  word_showing:        { en: 'Showing',                       zh: '显示' },
+  word_of:             { en: 'of',                             zh: '/ 共' },
+  word_peak_month:     { en: 'was the peak spending month',   zh: '是支出最高的月份' },
+  word_dominate:       { en: 'dominate spend',                 zh: '占支出主导' },
+  word_across_months:  { en: 'across',                          zh: '共' },
+  word_months:         { en: 'months',                          zh: '个月' },
+  word_period:         { en: 'Period:',                         zh: '期间：' },
+  word_generated:      { en: 'Generated:',                      zh: '生成于：' },
+  word_of_total_spend: { en: 'of total spend',                   zh: '总支出占比' },
+  word_filtered:       { en: 'Filtered',                          zh: '已筛选' },
+  word_total:          { en: 'Total',                             zh: '总计' },
+  word_txns_abbr:      { en: 'txns',                               zh: '笔' },
+  word_txn_abbr:       { en: 'txn',                                zh: '笔' },
+  word_total_lc:       { en: 'total',                              zh: '总计' },
+  word_avg:            { en: 'avg',                                zh: '平均' },
+  metric_total_spent:   { en: 'Total Spent',                  zh: '总支出' },
+  metric_avg_monthly:   { en: 'Avg Monthly',                  zh: '月均支出' },
+  metric_total_credits: { en: 'Total Credits',                zh: '总收款' },
+  metric_credits_sub:   { en: 'payments + cashback',          zh: '付款 + 返现' },
+  metric_transactions:  { en: 'Transactions',                 zh: '交易笔数' },
+  metric_txn_sub:       { en: 'debit transactions',           zh: '借记交易' },
+  btn_cancel:            { en: 'Cancel',                       zh: '取消' },
+  btn_generate_report:   { en: 'Generate report',              zh: '生成报告' },
+  upload_eyebrow:        { en: 'Transaction Analysis',         zh: '交易分析' },
+  upload_h1_line1:       { en: 'Upload your',                  zh: '上传您的' },
+  upload_h1_line2:       { en: 'bank statement',                zh: '银行账单' },
+  upload_intro:          { en: "Export a CSV from your bank's internet banking, then drop it here to generate your personal spending analysis.", zh: '从您的网上银行导出 CSV 文件，然后拖放到此处以生成您的个人支出分析。' },
+  upload_browse_hint:    { en: 'or click to browse · CSV, XLS, XLSX', zh: '或点击浏览 · CSV、XLS、XLSX' },
+  upload_hint_line1:     { en: 'Works with Westpac, ANZ, CommBank, NAB and most Australian bank CSV exports.', zh: '支持西太平洋银行、澳新银行、联邦银行、国民银行及大多数澳洲银行的 CSV 导出文件。' },
+  upload_hint_line2:     { en: 'Your data never leaves your device — everything runs in your browser.', zh: '您的数据不会离开您的设备——一切均在浏览器中运行。' },
+  btn_clear_saved:       { en: 'Clear saved data',              zh: '清除已保存的数据' },
+  title_sort_cat_name:   { en: 'Sort by category name',         zh: '按类别名称排序' },
+  title_sort_spend:      { en: 'Sort by spend amount',          zh: '按支出金额排序' },
+  title_sort_pct:        { en: 'Sort by percentage',            zh: '按百分比排序' },
+  hint_click_row_expand: { en: 'Click a row to expand transactions', zh: '点击一行以展开交易记录' },
+  hint_click_row_see:    { en: 'Click a row to see transactions',    zh: '点击一行以查看交易记录' },
+  obs_top_cat_title:    { en: 'Top category: {cat}',            zh: '最大类别：{cat}' },
+  obs_top_cat_body:     { en: '{cat} is your largest spending category at {amt}, representing {pct}% of total spend.', zh: '{cat}是您支出最多的类别，共 {amt}，占总支出的 {pct}%。' },
+  obs_top_merchant_title:{ en: 'Top merchant: {name}',          zh: '主要商户：{name}' },
+  obs_top_merchant_body: { en: 'Your most visited merchant totals {amt} across {n} {plural}.', zh: '您最常光顾的商户共消费 {amt}，共 {n} {plural}。' },
+  obs_dining_title:      { en: 'Dining out',                    zh: '外出就餐' },
+  obs_dining_body:       { en: '{n} dining transactions totalling {amt}. Average transaction: ${avg}.', zh: '共 {n} 笔餐饮交易，合计 {amt}。平均每笔：${avg}。' },
+  obs_groceries_title:   { en: 'Grocery spend',                 zh: '日用杂货支出' },
+  obs_groceries_body:    { en: '{amt} spent on groceries and supermarkets ({pct}% of total).', zh: '在日用杂货与超市共花费 {amt}（占总支出的 {pct}%）。' },
+  obs_travel_title:      { en: 'Travel & getaways',              zh: '旅行与出游' },
+  obs_travel_body:       { en: '{amt} on travel and accommodation across {n} transactions.', zh: '在旅行与住宿共花费 {amt}，共 {n} 笔交易。' },
+  obs_hardware_title:    { en: 'Hardware & home',                zh: '五金与家居' },
+  obs_hardware_body:     { en: '{amt} on hardware and home — {n} transactions.', zh: '在五金与家居共花费 {amt}——共 {n} 笔交易。' },
+  rec_utilities:        { en: 'Review recurring subscriptions and compare energy providers for better-value plans.', zh: '检查定期订阅并比较能源供应商，寻找更优惠的方案。' },
+  rec_hardware:         { en: 'Batch purchases to reduce impulse spending and consider trade accounts for volume discounts.', zh: '集中采购以减少冲动消费，并考虑开设批发账户以获得批量折扣。' },
+  rec_dining:           { en: 'Set a weekly dining cap and cook more meals at home to reduce takeaway costs.', zh: '设定每周餐饮支出上限，多在家做饭以减少外卖开支。' },
+  rec_fuel:             { en: 'Consolidate to supermarket-linked fuel stations for loyalty discounts.', zh: '集中前往与超市联营的加油站，以获得会员折扣。' },
+  rec_online:           { en: 'Use price trackers and set purchase waiting periods to reduce impulse buys.', zh: '使用价格追踪工具并设置购买冷静期，以减少冲动购物。' },
+  rec_entertainment:    { en: 'Look for family memberships or annual passes to reduce per-visit costs.', zh: '寻找家庭会员或年卡，以降低每次消费的成本。' },
+  rec_groceries:        { en: 'Plan weekly meals and use loyalty programs to maximise savings.', zh: '规划每周餐单并使用会员积分计划，以最大化节省开支。' },
+  rec_generic:          { en: 'Review your {cat} spending and look for ways to reduce or optimise costs.', zh: '检查您在{cat}方面的支出，寻找减少或优化开支的方法。' },
+  word_transaction_singular: { en: 'transaction',  zh: '笔交易' },
+  word_transaction_plural:   { en: 'transactions', zh: '笔交易' },
 };
 let CURRENT_LANG = (function () {
   try { return localStorage.getItem('txr_lang') || 'en'; } catch (e) { return 'en'; }
 })();
-function t(key) {
+function t(key, vars) {
   const entry = I18N[key];
-  if (!entry) return key;
-  return entry[CURRENT_LANG] || entry.en;
+  let str = entry ? (entry[CURRENT_LANG] || entry.en) : key;
+  if (vars) {
+    Object.keys(vars).forEach(k => { str = str.split('{' + k + '}').join(vars[k]); });
+  }
+  return str;
+}
+const CAT_I18N = {
+  'Groceries & supermarkets':   { zh: '日用杂货与超市' },
+  'Utilities & bills':          { zh: '水电煤与账单' },
+  'Hardware & home':            { zh: '五金与家居' },
+  'Dining & takeaway':          { zh: '餐饮与外卖' },
+  'Travel & accommodation':     { zh: '旅行与住宿' },
+  'Electronics & online':       { zh: '电子产品与网购' },
+  'Online shopping':            { zh: '网络购物' },
+  'Department stores':          { zh: '百货商店' },
+  'Car & Fuel':                 { zh: '汽车与燃油' },
+  'Entertainment & activities': { zh: '娱乐与活动' },
+  'Health & insurance':         { zh: '健康与保险' },
+  'Other':                      { zh: '其他' },
+  'Gifts & toys':               { zh: '礼品与玩具' },
+  'Clothing & lifestyle':       { zh: '服饰与生活方式' },
+  'Parking & fees':             { zh: '停车与手续费' },
+};
+function catName(name) {
+  const entry = CAT_I18N[name];
+  if (!entry) return name;
+  return CURRENT_LANG === 'zh' ? (entry.zh || name) : name;
+}
+function localeCode() {
+  return CURRENT_LANG === 'zh' ? 'zh-CN' : 'en-AU';
+}
+const MONTH_ABBR_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDateDisplay(dStr) {
+  // dStr is always stored as "D Mon YYYY" (e.g. "10 Jan 2025") regardless of
+  // language, since it's also used for parsing/sorting. This reformats it
+  // for display only, without touching the underlying stored value.
+  if (!dStr) return dStr;
+  if (CURRENT_LANG !== 'zh') return dStr;
+  const parts = dStr.split(' ');
+  if (parts.length !== 3) return dStr;
+  const [day, mon, year] = parts;
+  const mi = MONTH_ABBR_EN.indexOf(mon);
+  if (mi === -1) return dStr;
+  return `${year}年${mi + 1}月${parseInt(day, 10)}日`;
 }
 function applyI18n() {
   document.documentElement.lang = CURRENT_LANG === 'zh' ? 'zh-CN' : 'en';
@@ -1555,6 +1672,9 @@ function applyI18n() {
   });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
   });
   const langLabel = document.getElementById('btnLangToggleLabel');
   if (langLabel) langLabel.textContent = CURRENT_LANG === 'zh' ? 'EN' : '中文';
@@ -1567,6 +1687,19 @@ document.addEventListener('DOMContentLoaded', function () {
       CURRENT_LANG = CURRENT_LANG === 'zh' ? 'en' : 'zh';
       try { localStorage.setItem('txr_lang', CURRENT_LANG); } catch (e) {}
       applyI18n();
+      // Re-render dynamic, data-driven content (observations, recommendations,
+      // charts, tables) so it picks up the newly selected language too
+      if (window.ALL_TXN && window.ALL_TXN.length && typeof window._rebuildReport === 'function') {
+        window._rebuildReport(window.ALL_TXN.slice());
+        // rebuildCatTable() always force-collapses the category panel as
+        // part of a normal data rebuild; if it was open before this
+        // language switch, reopen it and refresh its contents in place.
+        if (typeof window._refreshOpenCatPanel === 'function') {
+          window._refreshOpenCatPanel();
+        }
+      } else if (typeof updateMetrics === 'function') {
+        updateMetrics();
+      }
     });
   }
 });
@@ -1619,18 +1752,24 @@ function rebuildDashboard(months, spend, cats, merchants, txns, totalSpend, tota
     const heroSrc = document.getElementById('heroSource');
     if (heroSrc) {
       if (window.EMBEDDED_DATA) {
-        heroSrc.textContent = 'Loaded · ' + txns.length + ' transactions (baked into this file)';
+        heroSrc.textContent = t('word_loaded') + ' · ' + txns.length + ' ' + t('word_transactions') + ' (' + t('word_baked_in') + ')';
       } else if (saved) {
         const ago = new Date(+saved);
-        heroSrc.textContent = 'Restored · ' + txns.length + ' transactions · saved '
-          + ago.toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+        heroSrc.textContent = t('word_restored') + ' · ' + txns.length + ' ' + t('word_transactions') + ' · ' + t('word_saved') + ' '
+          + ago.toLocaleDateString(localeCode(), { day:'2-digit', month:'short', year:'numeric' });
       }
     }
 
     // Run the full rebuild pipeline (charts, tables, metrics, observations)
     // Use setTimeout to allow all scripts/IIFEs to finish initialising first
+    let restoredCredit = 0;
+    if (typeof window.EMBEDDED_TOTAL_CREDIT === 'number') {
+      restoredCredit = window.EMBEDDED_TOTAL_CREDIT;
+    } else {
+      try { restoredCredit = parseFloat(localStorage.getItem('txr_total_credit')) || 0; } catch (e) {}
+    }
     setTimeout(() => {
-      if (typeof window._rebuildReport === 'function') window._rebuildReport(hydrated);
+      if (typeof window._rebuildReport === 'function') window._rebuildReport(hydrated, restoredCredit);
     }, 0);
 
   } catch(e) {
@@ -1651,10 +1790,11 @@ function rebuildDashboard(months, spend, cats, merchants, txns, totalSpend, tota
     try {
       let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
       const marker = '<script>\n// ── Data — populated by CSV upload';
+      const embeddedCredit = window.TOTAL_CREDIT || 0;
       if (html.includes(marker)) {
         html = html.replace(
           marker,
-          '<script>\nwindow.EMBEDDED_DATA = ' + raw + ';\n// ── Data — populated by CSV upload'
+          '<script>\nwindow.EMBEDDED_DATA = ' + raw + ';\nwindow.EMBEDDED_TOTAL_CREDIT = ' + embeddedCredit + ';\n// ── Data — populated by CSV upload'
         );
       }
       const blob = new Blob([html], { type: 'text/html' });
@@ -1737,22 +1877,22 @@ function renderTxnList(txns, query) {
   var minAmt     = matched.length > 1 ? Math.min.apply(null, matched.map(function(t){ return t.amt; })) :  Infinity;
 
   if (sorted.length === 0) {
-    panelList.innerHTML = '<div class="txn-empty">No transactions recorded</div>';
+    panelList.innerHTML = '<div class="txn-empty">' + t('empty_no_txns') + '</div>';
   } else {
     var rows = '';
     for (var i = 0; i < sorted.length; i++) {
-      var t       = sorted[i];
-      var visible = !q || t.desc.toLowerCase().indexOf(q) !== -1;
+      var tx      = sorted[i];
+      var visible = !q || tx.desc.toLowerCase().indexOf(q) !== -1;
       var cls     = 'txn-item';
-      if (visible && t.amt === maxAmt) cls += ' is-max';
-      if (visible && t.amt === minAmt) cls += ' is-min';
-      if (!visible)                    cls += ' hidden';
-      var safeDesc = t.desc.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-      var safeData = t.desc.toLowerCase().replace(/"/g,"'");
+      if (visible && tx.amt === maxAmt) cls += ' is-max';
+      if (visible && tx.amt === minAmt) cls += ' is-min';
+      if (!visible)                     cls += ' hidden';
+      var safeDesc = tx.desc.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      var safeData = tx.desc.toLowerCase().replace(/"/g,"'");
       rows += '<div class="' + cls + '" data-desc="' + safeData + '">'
-            + '<span class="txn-date">'  + t.d              + '</span>'
-            + '<span class="txn-desc">'  + safeDesc         + '</span>'
-            + '<span class="txn-amt">$'  + t.amt.toFixed(2) + '</span>'
+            + '<span class="txn-date">'  + fmtDateDisplay(tx.d) + '</span>'
+            + '<span class="txn-desc">'  + safeDesc          + '</span>'
+            + '<span class="txn-amt">$'  + tx.amt.toFixed(2) + '</span>'
             + '</div>';
     }
     panelList.innerHTML = rows;
@@ -1766,18 +1906,18 @@ function renderTxnList(txns, query) {
   };
 
   var leftHtml = isFiltered
-    ? '<span style="color:var(--blue)">' + shownCount + '</span> of ' + txns.length + ' transactions'
-    : txns.length + ' transactions';
+    ? '<span style="color:var(--blue)">' + shownCount + '</span> ' + t('word_of') + ' ' + txns.length + ' ' + t('word_transactions')
+    : txns.length + ' ' + t('word_transactions');
 
   var pillMain = '<span class="txn-count-pill">'
-    + '<span class="txn-count-pill-label">' + (isFiltered ? 'Filtered' : 'Total') + '</span>'
+    + '<span class="txn-count-pill-label">' + (isFiltered ? t('word_filtered') : t('word_total')) + '</span>'
     + '<span class="txn-count-pill-value' + (isFiltered ? ' is-filtered' : '') + '">' + fmtAmt(shownTotal) + '</span>'
     + '</span>';
 
   var pillCat = isFiltered
     ? '<span class="txn-count-divider"></span>'
       + '<span class="txn-count-pill">'
-      + '<span class="txn-count-pill-label">Category</span>'
+      + '<span class="txn-count-pill-label">' + t('col_category') + '</span>'
       + '<span class="txn-count-pill-value">' + fmtAmt(allTotal) + '</span>'
       + '</span>'
     : '';
@@ -1786,21 +1926,14 @@ function renderTxnList(txns, query) {
                        + '<span class="txn-count-right">' + pillMain + pillCat + '</span>';
 }
 // ── Open panel ───────────────────────────────────────────────────
-function openPanel(c, tr) {
-  if (activeCatRow === tr && panelOpen) { collapsePanel(); return; }
-  if (activeCatRow) activeCatRow.classList.remove('active');
-  activeCatRow = tr;
-  activeCat    = c;
-  tr.classList.add('active');
-  panelOpen = true;
-  breakdownBody.classList.remove('panel-collapsed');
-
+function populateCatPanel(c) {
+  activeCat = c;
   const txns     = window.ALL_TXN.filter(t => t.cat === c.name);
   currentTxns    = txns;
   const txnTotal = txns.reduce((s,t) => s+t.amt, 0);
   const avg      = txns.length ? txnTotal/txns.length : 0;
 
-  panelCat.textContent   = c.name;
+  panelCat.textContent   = catName(c.name);
   panelStats.textContent =
     `${txns.length} txns · $${txnTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} total · avg $${avg.toFixed(2)}`;
   panelSearch.value = '';
@@ -1809,9 +1942,30 @@ function openPanel(c, tr) {
 
   panelEmpty.style.display   = 'none';
   panelContent.style.display = 'flex';
+}
+
+function openPanel(c, tr) {
+  if (activeCatRow === tr && panelOpen) { collapsePanel(); return; }
+  if (activeCatRow) activeCatRow.classList.remove('active');
+  activeCatRow = tr;
+  tr.classList.add('active');
+  panelOpen = true;
+  breakdownBody.classList.remove('panel-collapsed');
+  populateCatPanel(c);
   panelContent.style.animation = 'none';
   requestAnimationFrame(() => { panelContent.style.animation = ''; });
 }
+
+// Re-render the currently open category panel in place (e.g. after a
+// language switch), without toggling it closed like a repeat click would.
+function refreshOpenCatPanel() {
+  if (!panelOpen || !activeCat) return;
+  if (breakdownBody) breakdownBody.classList.remove('panel-collapsed');
+  const liveCats = window.CATS || [];
+  const fresh = liveCats.find(c => c.name === activeCat.name) || activeCat;
+  populateCatPanel(fresh);
+}
+window._refreshOpenCatPanel = refreshOpenCatPanel;
 
 // ── Collapse button ──────────────────────────────────────────────
 btnCollapse.addEventListener('click', e => { e.stopPropagation(); collapsePanel(); });
@@ -1847,7 +2001,7 @@ function buildCatRows() {
 
   // Update footer total
   if (catFoot) {
-    catFoot.innerHTML = `<tr><td>Total</td><td style="text-align:right;font-family:'DM Mono',monospace">$${liveTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td style="text-align:right;font-family:'DM Mono',monospace">100%</td><td></td></tr>`;
+    catFoot.innerHTML = `<tr><td>${t('word_total')}</td><td style="text-align:right;font-family:'DM Mono',monospace">$${liveTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td style="text-align:right;font-family:'DM Mono',monospace">100%</td><td></td></tr>`;
   }
 
   // Sort the live cats
@@ -1865,7 +2019,7 @@ function buildCatRows() {
     tr.innerHTML = `
       <td>
         <div class="bar-wrap">
-          <span style="font-size:13px;color:#4a4640;white-space:nowrap;margin-right:6px">${c.name}</span>
+          <span style="font-size:13px;color:#4a4640;white-space:nowrap;margin-right:6px">${catName(c.name)}</span>
           <div class="bar-track">
             <div class="bar-fill" style="width:${pct}%;background:${c.color}"></div>
           </div>
@@ -1930,7 +2084,7 @@ function updateMetrics() {
 
   const months = spend.filter(v => v > 100).length || 1;
   const MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  function fmtD(d){ return MONS[d.getMonth()] + ' ' + d.getFullYear(); }
+  function fmtD(d){ return CURRENT_LANG === 'zh' ? (d.getFullYear() + '年' + (d.getMonth()+1) + '月') : (MONS[d.getMonth()] + ' ' + d.getFullYear()); }
   const dates = allTxn.map(t => { const p = t.d.split(' '); return new Date(+p[2], MONS.indexOf(p[1]), +p[0]); });
   const minD = dates.length ? new Date(Math.min(...dates)) : null;
   const maxD = dates.length ? new Date(Math.max(...dates)) : null;
@@ -1942,26 +2096,26 @@ function updateMetrics() {
   if (el('metTotalCredit')) el('metTotalCredit').textContent = '$' + totalCredit.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
   if (el('metTxnCount'))    el('metTxnCount').textContent    = numTxns.toLocaleString();
   if (el('metPeriod'))      el('metPeriod').textContent      = periodStr;
-  if (el('metMonths'))      el('metMonths').textContent      = 'across ' + months + ' months';
-  if (el('heroPeriod'))     el('heroPeriod').textContent     = 'Period: ' + periodStr;
+  if (el('metMonths'))      el('metMonths').textContent      = t('word_across_months') + ' ' + months + ' ' + t('word_months');
+  if (el('heroPeriod'))     el('heroPeriod').textContent     = t('word_period') + ' ' + periodStr;
   const now = new Date();
-  if (el('heroGenerated'))  el('heroGenerated').textContent  = 'Generated: ' + now.getDate() + ' ' + MONS[now.getMonth()] + ' ' + now.getFullYear();
-  if (el('footerLine1'))    el('footerLine1').textContent    = 'Statement Analysis \u00b7 ' + periodStr + ' \u00b7 ' + numTxns + ' transactions';
+  if (el('heroGenerated'))  el('heroGenerated').textContent  = t('word_generated') + ' ' + (CURRENT_LANG === 'zh' ? (now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日') : (now.getDate() + ' ' + MONS[now.getMonth()] + ' ' + now.getFullYear()));
+  if (el('footerLine1'))    el('footerLine1').textContent    = t('hero_badge') + ' \u00b7 ' + periodStr + ' \u00b7 ' + numTxns + ' ' + t('word_transactions');
 
   // Update dynamic chart titles
   const wSpend = window.SPEND || [];
   if (maxD && minD && wSpend.length) {
     const peakIdx = wSpend.indexOf(Math.max(...wSpend));
     const peakMon = (window.MONTHS || [])[peakIdx] || '';
-    if (el('monthlyChartTitle')) el('monthlyChartTitle').textContent = peakMon ? peakMon + ' was the peak spending month' : 'Monthly spending';
+    if (el('monthlyChartTitle')) el('monthlyChartTitle').textContent = peakMon ? peakMon + ' ' + t('word_peak_month') : t('title_monthly_default');
     if (el('monthlyChartDesc'))  el('monthlyChartDesc').textContent  = '';
   }
   if (window.CATS && window.CATS.length) {
-    const top2 = window.CATS.slice(0,2).map(c => c.name.split(' ')[0]).join(' & ');
-    if (el('donutChartTitle')) el('donutChartTitle').textContent = top2 + ' dominate spend';
+    const top2 = window.CATS.slice(0,2).map(c => catName(c.name).split(' ')[0]).join(' & ');
+    if (el('donutChartTitle')) el('donutChartTitle').textContent = top2 + ' ' + t('word_dominate');
   }
   if (window.MERCHANTS && window.MERCHANTS.length) {
-    if (el('merchantChartTitle')) el('merchantChartTitle').textContent = 'Top merchants by spend';
+    if (el('merchantChartTitle')) el('merchantChartTitle').textContent = t('title_merchant_default');
   }
 }
 
@@ -2030,7 +2184,7 @@ function updateMetrics() {
       localStorage.removeItem('txr_saved');
     } catch(e) {}
     if (clearWrap) clearWrap.style.display = 'none';
-    zone.querySelector('div:nth-child(2)').textContent = 'Drop CSV file here';
+    zone.querySelector('div:nth-child(2)').textContent = t('drop_csv_here');
     clearError();
     document.getElementById('uploadError') && (document.getElementById('uploadError').style.display = 'none');
   });
@@ -2092,7 +2246,7 @@ function updateMetrics() {
     });
     const cats = Object.keys(spendByCat).sort((a,b) => spendByCat[b] - spendByCat[a]);
     monthlyPanelCatFilter.innerHTML = '<option value="">' + t('opt_all_categories') + '</option>'
-      + cats.map(c => '<option value="' + c.replace(/"/g,'&quot;') + '">' + c + '</option>').join('');
+      + cats.map(c => '<option value="' + c.replace(/"/g,'&quot;') + '">' + catName(c) + '</option>').join('');
   }
 
   function renderMonthPanel() {
@@ -2115,8 +2269,11 @@ function updateMetrics() {
     const [mon, yr] = key.split(' ');
     const fullMons = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',
                       Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
-    if (monthlyPanelTitle) monthlyPanelTitle.textContent = (fullMons[mon]||mon) + ' 20' + yr;
-    if (monthlyPanelStats) monthlyPanelStats.textContent = txns.length + ' transaction' + (txns.length !== 1 ? 's' : '') + '  ·  $' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    const monIndex = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(mon);
+    if (monthlyPanelTitle) monthlyPanelTitle.textContent = CURRENT_LANG === 'zh'
+      ? ('20' + yr + '年' + (monIndex + 1) + '月')
+      : ((fullMons[mon]||mon) + ' 20' + yr);
+    if (monthlyPanelStats) monthlyPanelStats.textContent = txns.length + ' ' + (txns.length !== 1 ? t('word_transaction_plural') : t('word_transaction_singular')) + '  ·  $' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 
     const catColor = {};
     (window.CATS || []).forEach(c => { catColor[c.name] = c.color; });
@@ -2125,15 +2282,15 @@ function updateMetrics() {
       monthlyPanelList.innerHTML = sorted.map(t => {
         const dot = '<span style="width:8px;height:8px;border-radius:50%;background:' + (catColor[t.cat]||'#aaa') + ';display:inline-block;flex-shrink:0;margin-right:6px;"></span>';
         return '<div class="txn-item">'
-          + '<span class="txn-date">' + t.d + '</span>'
+          + '<span class="txn-date">' + fmtDateDisplay(t.d) + '</span>'
           + '<span class="txn-desc" style="display:flex;align-items:center;">' + dot + t.desc + '</span>'
           + '<span class="txn-amt">$' + t.amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '</span>'
           + '</div>';
       }).join('');
     }
     if (monthlyPanelCount) monthlyPanelCount.textContent = (monthSearch || monthCatFilter)
-      ? 'Showing ' + sorted.length + ' of ' + (window.ALL_TXN || []).filter(t => parseMonthKey(t.d) === key).length + ' transactions'
-      : 'Showing all ' + txns.length + ' transactions';
+      ? t('word_showing') + ' ' + sorted.length + ' ' + t('word_of') + ' ' + (window.ALL_TXN || []).filter(t => parseMonthKey(t.d) === key).length + ' ' + t('word_transactions')
+      : t('word_showing_all') + ' ' + txns.length + ' ' + t('word_transactions');
   }
 
   if (btnMonthlyCollapse) btnMonthlyCollapse.addEventListener('click', () => {
@@ -2585,7 +2742,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       sel.dataset.field = f.key;
       const blank = document.createElement('option');
       blank.value = '';
-      blank.textContent = '— not mapped —';
+      blank.textContent = t('not_mapped');
       sel.appendChild(blank);
       headers.forEach(h => {
         const opt = document.createElement('option');
@@ -2621,6 +2778,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
   function processRows(rows, mapping) {
     const txns = [];
     let skipped = 0;
+    let totalCredit = 0;
 
     for (const row of rows) {
       // Date
@@ -2641,7 +2799,14 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
         if (v !== null && v > 0) amt = v;
       }
 
-      // Skip credit-only rows
+      // Sum the credit column (payments in, refunds, cashback, etc.)
+      // regardless of whether this row also carries a debit amount
+      if (mapping.credit) {
+        const cv = parseAmount(row[mapping.credit]);
+        if (cv !== null && cv > 0) totalCredit += cv;
+      }
+
+      // Skip credit-only rows (no debit/spend amount to record as a transaction)
       if (amt === null || amt <= 0) { skipped++; continue; }
 
       const desc = (mapping.desc && row[mapping.desc]) ? String(row[mapping.desc]).trim() : 'Unknown';
@@ -2655,11 +2820,11 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       });
     }
 
-    return { txns, skipped };
+    return { txns, skipped, totalCredit };
   }
 
   // ── Rebuild report data structures ───────────────────────────
-  function rebuildReport(txns) {
+  function rebuildReport(txns, totalCreditIn) {
     if (!txns.length) return;
 
     // Sort by date desc
@@ -2672,6 +2837,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
     function fmtPeriod(d) {
+      if (CURRENT_LANG === 'zh') return `${d.getFullYear()}年${d.getMonth()+1}月`;
       return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
     }
 
@@ -2735,7 +2901,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     // We need to update the global state that the rest of the page uses
     // Re-assign globals
     window.TOTAL_SPEND  = totalSpend;
-    window.TOTAL_CREDIT = 0;
+    window.TOTAL_CREDIT = (typeof totalCreditIn === 'number') ? totalCreditIn : (window.TOTAL_CREDIT || 0);
     window.NUM_TXNS     = txns.length;
     window.MONTHS       = allMonths;
     window.SPEND        = spendArr;
@@ -2748,53 +2914,54 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       const payload = JSON.stringify(txns.map(t => ({ d: t.d, desc: t.desc, amt: t.amt, cat: t.cat })));
       localStorage.setItem('txr_txns', payload);
       localStorage.setItem('txr_saved', Date.now());
+      localStorage.setItem('txr_total_credit', String(window.TOTAL_CREDIT));
     } catch(e) { console.warn('localStorage save failed:', e.message); }
 
     // ── Update hero header ──────────────────────────────────────
     const heroBadge = document.querySelector('.hero-badge');
-    if (heroBadge) heroBadge.textContent = 'Statement Analysis';
+    if (heroBadge) heroBadge.textContent = t('hero_badge');
     const heroperiod = document.getElementById('heroPeriod');
-    if (heroperiod) heroperiod.textContent = `Period: ${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
+    if (heroperiod) heroperiod.textContent = `${t('word_period')} ${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
     const heroGen = document.getElementById('heroGenerated');
-    if (heroGen) heroGen.textContent = `Generated: ${new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'})}`;
+    if (heroGen) heroGen.textContent = `${t('word_generated')} ${new Date().toLocaleDateString(localeCode(),{day:'2-digit',month:'short',year:'numeric'})}`;
     const heroSrc = document.getElementById('heroSource');
-    if (heroSrc) heroSrc.textContent = `${txns.length} transactions`;
+    if (heroSrc) heroSrc.textContent = `${txns.length} ${t('word_transactions')}`;
 
     // ── Update metric cards ─────────────────────────────────────
     const el = id => document.getElementById(id);
     if (el('metTotalSpend'))  el('metTotalSpend').textContent  = '$' + totalSpend.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     if (el('metAvgMonthly'))  el('metAvgMonthly').textContent  = '$' + Math.round(totalSpend / activeMos).toLocaleString();
-    if (el('metTotalCredit')) el('metTotalCredit').textContent = '$0.00';
+    if (el('metTotalCredit')) el('metTotalCredit').textContent = '$' + window.TOTAL_CREDIT.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     if (el('metTxnCount'))    el('metTxnCount').textContent    = txns.length.toLocaleString();
     if (el('metPeriod'))      el('metPeriod').textContent      = `${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
-    if (el('metMonths'))      el('metMonths').textContent      = `across ${activeMos} month${activeMos !== 1 ? 's' : ''}`;
+    if (el('metMonths'))      el('metMonths').textContent      = `${t('word_across_months')} ${activeMos} ${t('word_months')}`;
 
     // ── Update section 2 chart title ───────────────────────────
     const peakMonth = allMonths[spendArr.indexOf(Math.max(...spendArr))];
     const peakEl = document.getElementById('monthlyChartTitle');
-    if (peakEl) peakEl.textContent = `${peakMonth || 'Peak'} was the highest spending month`;
+    if (peakEl) peakEl.textContent = `${peakMonth || 'Peak'} ${t('word_peak_month')}`;
 
     // ── Update section 3 donut title ───────────────────────────
     const top2 = catsArr.slice(0,2);
     const top2pct = top2.length > 1 ? Math.round((top2[0].val + top2[1].val) / totalSpend * 100) : 0;
     const donutTitle = document.getElementById('donutChartTitle');
     if (donutTitle && top2.length >= 2) {
-      donutTitle.textContent = `${top2[0].name} & ${top2[1].name} = ${top2pct}% of total spend`;
+      donutTitle.textContent = `${catName(top2[0].name)} & ${catName(top2[1].name)} = ${top2pct}% ${t('word_of_total_spend')}`;
     }
 
     // ── Update merchant chart title ─────────────────────────────
     const merchantTitle = document.getElementById('merchantChartTitle');
-    if (merchantTitle) merchantTitle.textContent = 'Top merchants by spend';
+    if (merchantTitle) merchantTitle.textContent = t('title_merchant_default');
 
     // ── Update footer ───────────────────────────────────────────
     const footerLine1 = document.getElementById('footerLine1');
-    if (footerLine1) footerLine1.textContent = `Statement Analysis · ${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)} · ${txns.length} transactions`;
+    if (footerLine1) footerLine1.textContent = `${t('hero_badge')} · ${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)} · ${txns.length} ${t('word_transactions')}`;
 
     // ── Rebuild donut legend ────────────────────────────────────
     const donutLegend = document.querySelector('.donut-legend');
     if (donutLegend) {
       donutLegend.innerHTML = catsArr.slice(0,7).map(c =>
-        `<div class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.name}</div>`
+        `<div class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${catName(c.name)}</div>`
       ).join('');
     }
 
@@ -2832,12 +2999,12 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
 
     const obs = [];
 
-    if (topCat.val) obs.push({ icon: '📊', title: `Top category: ${topCat.name}`, body: `${topCat.name} is your largest spending category at ${fmtMoney(topCat.val)}, representing ${Math.round(topCat.val/total*100)}% of total spend.` });
-    if (topMerchant.spend) obs.push({ icon: '🏪', title: `Top merchant: ${topMerchant.name.split(' ').slice(0,3).join(' ')}`, body: `Your most visited merchant totals ${fmtMoney(topMerchant.spend)} across ${topMerchant.visits} transaction${topMerchant.visits !== 1 ? 's' : ''}.` });
-    if (diningCat) { const avg = Math.round(diningCat.val / txns.filter(t=>t.cat==='Dining & takeaway').length * 100) / 100; obs.push({ icon: '🍜', title: 'Dining out', body: `${txns.filter(t=>t.cat==='Dining & takeaway').length} dining transactions totalling ${fmtMoney(diningCat.val)}. Average transaction: $${avg.toFixed(2)}.` }); }
-    if (groceriesCat) obs.push({ icon: '🛒', title: 'Grocery spend', body: `${fmtMoney(groceriesCat.val)} spent on groceries and supermarkets (${Math.round(groceriesCat.val/total*100)}% of total).` });
-    if (travelCat) obs.push({ icon: '✈️', title: 'Travel & getaways', body: `${fmtMoney(travelCat.val)} on travel and accommodation across ${txns.filter(t=>t.cat==='Travel & accommodation').length} transactions.` });
-    if (hardwareCat) obs.push({ icon: '🔨', title: 'Hardware & home', body: `${fmtMoney(hardwareCat.val)} on hardware and home — ${txns.filter(t=>t.cat==='Hardware & home').length} transactions.` });
+    if (topCat.val) obs.push({ icon: '📊', title: t('obs_top_cat_title', { cat: catName(topCat.name) }), body: t('obs_top_cat_body', { cat: catName(topCat.name), amt: fmtMoney(topCat.val), pct: Math.round(topCat.val/total*100) }) });
+    if (topMerchant.spend) obs.push({ icon: '🏪', title: t('obs_top_merchant_title', { name: topMerchant.name.split(' ').slice(0,3).join(' ') }), body: t('obs_top_merchant_body', { amt: fmtMoney(topMerchant.spend), n: topMerchant.visits, plural: topMerchant.visits !== 1 ? t('word_txns_abbr') : t('word_txn_abbr') }) });
+    if (diningCat) { const n = txns.filter(t=>t.cat==='Dining & takeaway').length; const avg = Math.round(diningCat.val / n * 100) / 100; obs.push({ icon: '🍜', title: t('obs_dining_title'), body: t('obs_dining_body', { n, amt: fmtMoney(diningCat.val), avg: avg.toFixed(2) }) }); }
+    if (groceriesCat) obs.push({ icon: '🛒', title: t('obs_groceries_title'), body: t('obs_groceries_body', { amt: fmtMoney(groceriesCat.val), pct: Math.round(groceriesCat.val/total*100) }) });
+    if (travelCat) obs.push({ icon: '✈️', title: t('obs_travel_title'), body: t('obs_travel_body', { amt: fmtMoney(travelCat.val), n: txns.filter(t=>t.cat==='Travel & accommodation').length }) });
+    if (hardwareCat) obs.push({ icon: '🔨', title: t('obs_hardware_title'), body: t('obs_hardware_body', { amt: fmtMoney(hardwareCat.val), n: txns.filter(t=>t.cat==='Hardware & home').length }) });
 
     obsGrid.innerHTML = obs.slice(0,6).map(o => `
       <div class="obs-card">
@@ -2851,20 +3018,20 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     const recList = document.getElementById('recList') || document.querySelector('.rec-list');
     if (!recList) return;
 
-    const suggestions = {
-      'Utilities & bills': 'Review recurring subscriptions and compare energy providers for better-value plans.',
-      'Hardware & home': 'Batch purchases to reduce impulse spending and consider trade accounts for volume discounts.',
-      'Dining & takeaway': 'Set a weekly dining cap and cook more meals at home to reduce takeaway costs.',
-      'Car & Fuel': 'Consolidate to supermarket-linked fuel stations for loyalty discounts.',
-      'Online shopping': 'Use price trackers and set purchase waiting periods to reduce impulse buys.',
-      'Entertainment & activities': 'Look for family memberships or annual passes to reduce per-visit costs.',
-      'Groceries & supermarkets': 'Plan weekly meals and use loyalty programs to maximise savings.',
+    const suggestionKeys = {
+      'Utilities & bills': 'rec_utilities',
+      'Hardware & home': 'rec_hardware',
+      'Dining & takeaway': 'rec_dining',
+      'Car & Fuel': 'rec_fuel',
+      'Online shopping': 'rec_online',
+      'Entertainment & activities': 'rec_entertainment',
+      'Groceries & supermarkets': 'rec_groceries',
     };
 
     const items = cats.slice(0,4).map(c => ({
-      area: c.name,
+      area: catName(c.name),
       val: c.val,
-      text: suggestions[c.name] || `Review your ${c.name} spending and look for ways to reduce or optimise costs.`
+      text: suggestionKeys[c.name] ? t(suggestionKeys[c.name]) : t('rec_generic', { cat: catName(c.name) })
     }));
 
     recList.innerHTML = items.map(i => `
@@ -2905,7 +3072,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
           if (total < 1) return;
           const item = document.createElement('div');
           item.className = 'legend-item';
-          item.innerHTML = '<span class="legend-dot" style="background:' + c.color + ';width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;margin-right:6px"></span>' + c.name;
+          item.innerHTML = '<span class="legend-dot" style="background:' + c.color + ';width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;margin-right:6px"></span>' + catName(c.name);
           legendEl.appendChild(item);
         });
       }
@@ -2914,7 +3081,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
         data: {
           labels: months,
           datasets: cats.map(c => ({
-            label: c.name,
+            label: catName(c.name),
             data: monthlyByCat[c.name] || months.map(()=>0),
             backgroundColor: c.color,
             borderWidth: 0,
@@ -2987,7 +3154,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       new Chart(donutCtx, {
         type: 'doughnut',
         data: {
-          labels: cats.map(c => c.name),
+          labels: cats.map(c => catName(c.name)),
           datasets: [{ data: cats.map(c => c.val), backgroundColor: cats.map(c => c.color), borderWidth: 2, borderColor: '#fff' }]
         },
         options: {
@@ -3030,7 +3197,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     const total = cats.reduce((s,c) => s+c.val, 0);
     catBody.innerHTML = '';
     if (catFoot) {
-      catFoot.innerHTML = `<tr><td>Total</td><td style="text-align:right;font-family:'DM Mono',monospace">$${total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td style="text-align:right;font-family:'DM Mono',monospace">100%</td><td></td></tr>`;
+      catFoot.innerHTML = `<tr><td>${t('word_total')}</td><td style="text-align:right;font-family:'DM Mono',monospace">$${total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td style="text-align:right;font-family:'DM Mono',monospace">100%</td><td></td></tr>`;
     }
 
     // Re-trigger buildCatRows if it exists as a global
@@ -3042,7 +3209,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
         const tr = document.createElement('tr');
         tr.className = 'cat-row';
         tr.innerHTML = `
-          <td><div class="bar-wrap"><span style="font-size:13px;color:#4a4640;white-space:nowrap;margin-right:6px">${c.name}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c.color}"></div></div></div></td>
+          <td><div class="bar-wrap"><span style="font-size:13px;color:#4a4640;white-space:nowrap;margin-right:6px">${catName(c.name)}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c.color}"></div></div></div></td>
           <td class="val" style="text-align:right;white-space:nowrap;font-family:'DM Mono',monospace;font-size:13px">$${c.val.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
           <td class="pct" style="text-align:right;font-family:'DM Mono',monospace;font-size:12px;color:var(--ink3)">${pct}%</td>
           <td style="text-align:center;padding:0 10px;"><i class="chevron">▶</i></td>`;
@@ -3159,7 +3326,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     uploadBanner.classList.add('processing');
 
     setTimeout(() => {
-      const { txns, skipped } = processRows(parsedRows, currentMapping);
+      const { txns, skipped, totalCredit } = processRows(parsedRows, currentMapping);
       if (!txns.length) {
         setStatus(`No valid debit transactions found. ${skipped} rows skipped.`, true);
         setProgress(-1);
@@ -3168,7 +3335,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       }
 
       setProgress(90);
-      rebuildReport(txns);
+      rebuildReport(txns, totalCredit);
       setProgress(100);
       setTimeout(() => {
         setProgress(-1);
@@ -3297,7 +3464,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       tr.className = 'merchant-row';
       tr.innerHTML =
         '<td style="font-weight:500">' + escHtml(m.name) + '</td>' +
-        '<td><span style="font-size:11px;background:var(--paper2);border-radius:4px;padding:2px 8px;color:var(--ink3)">' + escHtml(m.cat) + '</span></td>' +
+        '<td><span style="font-size:11px;background:var(--paper2);border-radius:4px;padding:2px 8px;color:var(--ink3)">' + escHtml(catName(m.cat)) + '</span></td>' +
         '<td class="val" style="text-align:right">$' + m.spend.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '</td>' +
         '<td class="pct" style="text-align:right">' + m.visits + '</td>' +
         '<td style="text-align:center;padding:0 8px"><i class="chevron">›</i></td>';
@@ -3439,14 +3606,14 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
       '  ·  $' + total.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     merchantPanelList.innerHTML = sorted.map(t =>
       '<div class="txn-item">' +
-      '<div class="txn-date">' + t.d + '</div>' +
+      '<div class="txn-date">' + fmtDateDisplay(t.d) + '</div>' +
       '<div class="txn-desc">' + t.desc + '</div>' +
       '<div class="txn-amt">$' + t.amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + '</div>' +
       '</div>'
     ).join('');
     merchantPanelCount.textContent = sorted.length === filtered.length
-      ? 'Showing all ' + filtered.length + ' transactions'
-      : 'Showing ' + sorted.length + ' of ' + filtered.length + ' transactions';
+      ? t('word_showing_all') + ' ' + filtered.length + ' ' + t('word_transactions')
+      : t('word_showing') + ' ' + sorted.length + ' ' + t('word_of') + ' ' + filtered.length + ' ' + t('word_transactions');
   }
 
   function collapseMerchantPanel() {
