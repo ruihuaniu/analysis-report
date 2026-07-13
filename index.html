@@ -137,10 +137,11 @@
   /* ── Metric cards ────────────────────────────────────── */
   .metrics {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 14px;
     margin-bottom: 44px;
   }
+  @media (max-width: 1000px) { .metrics { grid-template-columns: repeat(3,1fr); } }
   @media (max-width: 700px) { .metrics { grid-template-columns: repeat(2,1fr); } }
   .metric {
     background: var(--paper2);
@@ -158,8 +159,9 @@
   }
   .metric:nth-child(1)::before { background: var(--blue); }
   .metric:nth-child(2)::before { background: var(--teal); }
-  .metric:nth-child(3)::before { background: var(--purple); }
-  .metric:nth-child(4)::before { background: var(--amber); }
+  .metric:nth-child(3)::before { background: var(--coral); }
+  .metric:nth-child(4)::before { background: var(--pink); }
+  .metric:nth-child(5)::before { background: var(--amber); }
   .metric-label {
     font-size: 11px;
     font-family: 'DM Mono', monospace;
@@ -801,9 +803,15 @@
     cursor: pointer;
     transition: background 0.12s, color 0.12s;
     white-space: nowrap;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .mview-btn:hover { background: var(--paper3); color: var(--ink); }
+  .mview-btn:active { background: var(--ink); color: #fff; }
   .mview-btn.active { background: var(--ink); color: #fff; }
+  @media (max-width: 700px) {
+    .mview-btn { padding: 6px 11px; font-size: 12px; }
+  }
 
   .legend-item--trend {
     cursor: pointer;
@@ -811,10 +819,18 @@
     border-radius: 5px;
     transition: background 0.12s, opacity 0.15s;
     user-select: none;
+    touch-action: manipulation; /* removes the ~300ms tap delay on mobile */
+    -webkit-tap-highlight-color: transparent;
   }
   .legend-item--trend:hover { background: var(--paper2); }
+  .legend-item--trend:active { background: var(--paper3); }
   .legend-item--trend.legend-item--off { opacity: 0.35; }
   .legend-item--trend.legend-item--off:hover { opacity: 0.6; }
+  @media (max-width: 700px) {
+    /* Bigger tap targets on touch-sized screens (~44px min per a11y guidance) */
+    .legend-item--trend { padding: 7px 10px 7px 6px; gap: 8px; }
+    .legend-item--trend .legend-dot { width: 12px; height: 12px; }
+  }
   .mview-hint {
     display: none;
     font-size: 11.5px;
@@ -1296,9 +1312,14 @@
         <div class="metric-sub" id="metMonths">—</div>
       </div>
       <div class="metric">
-        <div class="metric-label" data-i18n="metric_total_credits">Total Credits</div>
-        <div class="metric-value" id="metTotalCredit">—</div>
-        <div class="metric-sub" data-i18n="metric_credits_sub">payments + cashback</div>
+        <div class="metric-label" data-i18n="metric_highest_month">Highest Monthly</div>
+        <div class="metric-value" id="metHighestMonth">—</div>
+        <div class="metric-sub" id="metHighestMonthSub">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label" data-i18n="metric_lowest_month">Lowest Monthly</div>
+        <div class="metric-value" id="metLowestMonth">—</div>
+        <div class="metric-sub" id="metLowestMonthSub">—</div>
       </div>
       <div class="metric">
         <div class="metric-label" data-i18n="metric_transactions">Transactions</div>
@@ -1325,7 +1346,7 @@
         <div id="monthlyLegend" class="legend" style="margin-bottom:0;"></div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <div class="mview-group" id="monthlyQuickActions" style="display:none;">
-            <button type="button" class="mview-btn" data-mquick="top5" data-i18n="btn_quick_top5">Top 5</button>
+            <button type="button" class="mview-btn" data-mquick="top3" data-i18n="btn_quick_top3">Top 3</button>
             <button type="button" class="mview-btn" data-mquick="all" data-i18n="btn_quick_all">Show all</button>
           </div>
           <div class="mview-group" id="monthlyViewToggle">
@@ -1599,7 +1620,7 @@ const I18N = {
   lbl_view:            { en: 'View:',                      zh: '视图：' },
   btn_view_stacked:    { en: 'By month',                   zh: '按月' },
   btn_view_trend:      { en: 'Category trend',             zh: '类别趋势' },
-  btn_quick_top5:      { en: 'Top 5',                       zh: '前 5 项' },
+  btn_quick_top3:      { en: 'Top 3',                       zh: '前 3 项' },
   btn_quick_all:       { en: 'Show all',                    zh: '显示全部' },
   hint_monthly_trend:  { en: 'Showing {n} of {total} categories \u2014 click a category above to add or remove it, or hover a line to isolate it.', zh: '正在显示 {total} 个类别中的 {n} 个——点击上方类别可添加或移除，悬停线条可单独查看。' },
   desc_monthly_trend:  { en: 'Each line traces one category\u2019s spend across months \u2014 use it to spot which categories are rising, falling, or spiking.', zh: '每条线代表一个类别在各月的支出走势——可用于发现哪些类别在上升、下降或出现峰值。' },
@@ -1654,8 +1675,8 @@ const I18N = {
   word_avg:            { en: 'avg',                                zh: '平均' },
   metric_total_spent:   { en: 'Total Spent',                  zh: '总支出' },
   metric_avg_monthly:   { en: 'Avg Monthly',                  zh: '月均支出' },
-  metric_total_credits: { en: 'Total Credits',                zh: '总收款' },
-  metric_credits_sub:   { en: 'payments + cashback',          zh: '付款 + 返现' },
+  metric_highest_month: { en: 'Highest Monthly',              zh: '最高月份' },
+  metric_lowest_month:  { en: 'Lowest Monthly',                zh: '最低月份' },
   metric_transactions:  { en: 'Transactions',                 zh: '交易笔数' },
   metric_txn_sub:       { en: 'debit transactions',           zh: '借记交易' },
   btn_cancel:            { en: 'Cancel',                       zh: '取消' },
@@ -1763,6 +1784,21 @@ function fmtMonthKeyDisplay(mk) {
   const mi = MONTH_ABBR_EN.indexOf(mon);
   if (mi === -1) return mk;
   return `${yy}年${mi + 1}月`;
+}
+function fmtMonthKeyFullYear(mk) {
+  // Like fmtMonthKeyDisplay, but always spells out the full 4-digit year
+  // (e.g. "Feb 2026" / "2026年2月") — used for metric-card sub-labels.
+  if (!mk) return mk;
+  const parts = mk.split(' ');
+  if (parts.length !== 2) return mk;
+  const [mon, yy] = parts;
+  const fullYear = yy.length === 2 ? '20' + yy : yy;
+  if (CURRENT_LANG === 'zh') {
+    const mi = MONTH_ABBR_EN.indexOf(mon);
+    if (mi === -1) return mk;
+    return `${fullYear}年${mi + 1}月`;
+  }
+  return `${mon} ${fullYear}`;
 }
 function applyI18n() {
   document.documentElement.lang = CURRENT_LANG === 'zh' ? 'zh-CN' : 'en';
@@ -1919,7 +1955,7 @@ const TICK_COLOR = '#8a8680';
 // ── Monthly chart: shared renderer for "stacked by month" / "category trend" views ──
 window._monthlyViewMode = window._monthlyViewMode || 'stacked';
 window._monthlyHiddenCats = window._monthlyHiddenCats || null; // Set of category names hidden in trend view
-const MONTHLY_TREND_AUTO_LIMIT = 5; // when more categories than this, only the top N show by default
+const MONTHLY_TREND_AUTO_LIMIT = 3; // when more categories than this, only the top N show by default
 function moneyTick(v) {
   if (v < 1000) return '$' + v.toLocaleString();
   const k = Math.round(v / 100) / 10;
@@ -1967,16 +2003,23 @@ window._renderMonthlyCore = function(months, cats, monthlyByCat, mode) {
       legendEl.appendChild(item);
 
       if (mode === 'trend') {
-        item.addEventListener('click', () => {
+        const toggleCat = () => {
           const chart = window._monthlyChartInst;
           if (!chart) return;
           const idx = chart.data.datasets.findIndex(ds => ds._catName === c.name);
           if (idx === -1) return;
-          const nowHidden = !chart.isDatasetVisible(idx);
-          if (nowHidden) { chart.show(idx); window._monthlyHiddenCats.delete(c.name); }
-          else { chart.hide(idx); window._monthlyHiddenCats.add(c.name); }
-          item.classList.toggle('legend-item--off', !chart.isDatasetVisible(idx));
-        });
+          const currentlyVisible = chart.isDatasetVisible(idx);
+          chart.setDatasetVisibility(idx, !currentlyVisible);
+          // 'none' mode skips the animation so the line appears/disappears
+          // instantly — animated show/hide reads as "laggy" on touch devices.
+          chart.update('none');
+          if (currentlyVisible) window._monthlyHiddenCats.add(c.name);
+          else window._monthlyHiddenCats.delete(c.name);
+          item.classList.toggle('legend-item--off', currentlyVisible);
+        };
+        // click fires for both mouse clicks and taps; no separate touch
+        // handler is needed and would risk double-firing on some browsers.
+        item.addEventListener('click', toggleCat);
         item.addEventListener('mouseenter', () => {
           const chart = window._monthlyChartInst;
           if (!chart) return;
@@ -2133,7 +2176,7 @@ window._renderMonthlyCore = function(months, cats, monthlyByCat, mode) {
         const d = window._monthlyChartData;
         if (!d) return;
         const activeCats = d.cats.filter(c => (d.monthlyByCat[c.name] || []).reduce((s, v) => s + v, 0) >= 1);
-        if (btn.dataset.mquick === 'top5') window._monthlyHiddenCats = defaultHiddenCatSet(activeCats);
+        if (btn.dataset.mquick === 'top3') window._monthlyHiddenCats = defaultHiddenCatSet(activeCats);
         else window._monthlyHiddenCats = new Set();
         window._renderMonthlyCore(d.months, d.cats, d.monthlyByCat, 'trend');
       });
@@ -2401,7 +2444,6 @@ if (initSortBtn) {
 // ── Summary metric cards ─────────────────────────────────────────
 function updateMetrics() {
   const totalSpend  = window.TOTAL_SPEND  || 0;
-  const totalCredit = window.TOTAL_CREDIT || 0;
   const numTxns     = window.NUM_TXNS     || 0;
   const allTxn      = window.ALL_TXN      || [];
   const spend       = window.SPEND        || [];
@@ -2417,7 +2459,21 @@ function updateMetrics() {
   const el = id => document.getElementById(id);
   if (el('metTotalSpend'))  el('metTotalSpend').textContent  = '$' + totalSpend.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
   if (el('metAvgMonthly'))  el('metAvgMonthly').textContent  = '$' + Math.round(totalSpend / months).toLocaleString();
-  if (el('metTotalCredit')) el('metTotalCredit').textContent = '$' + totalCredit.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // Highest / lowest monthly spend — prefer "active" months (>$100) so a
+  // partial first/last month with only a handful of dollars in it doesn't
+  // get crowned "lowest month" by accident.
+  const monthKeys  = window.MONTHS || [];
+  const idxAll     = spend.map((v, i) => i);
+  const activeIdx  = idxAll.filter(i => spend[i] > 100);
+  const poolIdx    = activeIdx.length ? activeIdx : idxAll.filter(i => spend[i] > 0);
+  const highestIdx = spend.length ? spend.indexOf(Math.max(...spend)) : -1;
+  const lowestIdx  = poolIdx.length ? poolIdx.reduce((best, i) => spend[i] < spend[best] ? i : best, poolIdx[0]) : -1;
+  if (el('metHighestMonth'))    el('metHighestMonth').textContent    = highestIdx > -1 ? '$' + spend[highestIdx].toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
+  if (el('metHighestMonthSub')) el('metHighestMonthSub').textContent = highestIdx > -1 ? fmtMonthKeyFullYear(monthKeys[highestIdx]) : '\u2014';
+  if (el('metLowestMonth'))     el('metLowestMonth').textContent     = lowestIdx > -1 ? '$' + spend[lowestIdx].toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
+  if (el('metLowestMonthSub'))  el('metLowestMonthSub').textContent  = lowestIdx > -1 ? fmtMonthKeyFullYear(monthKeys[lowestIdx]) : '\u2014';
+
   if (el('metTxnCount'))    el('metTxnCount').textContent    = numTxns.toLocaleString();
   if (el('metPeriod'))      el('metPeriod').textContent      = periodStr;
   if (el('metMonths'))      el('metMonths').textContent      = t('word_across_months') + ' ' + months + ' ' + t('word_months');
@@ -3211,7 +3267,17 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     const el = id => document.getElementById(id);
     if (el('metTotalSpend'))  el('metTotalSpend').textContent  = '$' + totalSpend.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     if (el('metAvgMonthly'))  el('metAvgMonthly').textContent  = '$' + Math.round(totalSpend / activeMos).toLocaleString();
-    if (el('metTotalCredit')) el('metTotalCredit').textContent = '$' + window.TOTAL_CREDIT.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    {
+      const idxAll    = spendArr.map((v, i) => i);
+      const activeIdx = idxAll.filter(i => spendArr[i] > 100);
+      const poolIdx   = activeIdx.length ? activeIdx : idxAll.filter(i => spendArr[i] > 0);
+      const hiIdx     = spendArr.length ? spendArr.indexOf(Math.max(...spendArr)) : -1;
+      const loIdx     = poolIdx.length ? poolIdx.reduce((best, i) => spendArr[i] < spendArr[best] ? i : best, poolIdx[0]) : -1;
+      if (el('metHighestMonth'))    el('metHighestMonth').textContent    = hiIdx > -1 ? '$' + spendArr[hiIdx].toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
+      if (el('metHighestMonthSub')) el('metHighestMonthSub').textContent = hiIdx > -1 ? fmtMonthKeyFullYear(allMonths[hiIdx]) : '\u2014';
+      if (el('metLowestMonth'))     el('metLowestMonth').textContent     = loIdx > -1 ? '$' + spendArr[loIdx].toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '\u2014';
+      if (el('metLowestMonthSub'))  el('metLowestMonthSub').textContent  = loIdx > -1 ? fmtMonthKeyFullYear(allMonths[loIdx]) : '\u2014';
+    }
     if (el('metTxnCount'))    el('metTxnCount').textContent    = txns.length.toLocaleString();
     if (el('metPeriod'))      el('metPeriod').textContent      = `${fmtPeriod(minDate)} – ${fmtPeriod(maxDate)}`;
     if (el('metMonths'))      el('metMonths').textContent      = `${t('word_across_months')} ${activeMos} ${t('word_months')}`;
