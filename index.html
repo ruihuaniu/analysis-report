@@ -763,6 +763,65 @@
   .detail-sort-btn:hover { background: var(--paper3); color: var(--ink); }
   .detail-sort-btn.active { background: var(--ink); color: #fff; }
 
+  /* ── Monthly chart view toggle (stacked / category-trend) ────── */
+  .mview-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-bottom: 12px;
+  }
+  .mview-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--paper2);
+    border: 1px solid var(--paper3);
+    border-radius: 6px;
+    padding: 3px 6px;
+    flex-shrink: 0;
+  }
+  .mview-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-right: 2px;
+  }
+  .mview-btn {
+    background: none;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink3);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    white-space: nowrap;
+  }
+  .mview-btn:hover { background: var(--paper3); color: var(--ink); }
+  .mview-btn.active { background: var(--ink); color: #fff; }
+
+  .legend-item--trend {
+    cursor: pointer;
+    padding: 2px 6px 2px 2px;
+    border-radius: 5px;
+    transition: background 0.12s, opacity 0.15s;
+    user-select: none;
+  }
+  .legend-item--trend:hover { background: var(--paper2); }
+  .legend-item--trend.legend-item--off { opacity: 0.35; }
+  .legend-item--trend.legend-item--off:hover { opacity: 0.6; }
+  .mview-hint {
+    display: none;
+    font-size: 11.5px;
+    color: var(--ink3);
+    margin: -4px 0 12px;
+  }
+
   /* highlighted max row in panel */
   .txn-item.is-max .txn-amt { color: var(--teal); font-weight: 600; }
   .txn-item.is-min .txn-amt { color: var(--ink3); }
@@ -1262,9 +1321,23 @@
         <div class="chart-title" id="monthlyChartTitle" data-i18n="title_monthly_default">Monthly spending</div>
         <div class="chart-desc" id="monthlyChartDesc" style="margin-bottom:0"></div>
       </div>
-      <div id="monthlyLegend" class="legend" style="margin-bottom:12px;"></div>
+      <div class="mview-row">
+        <div id="monthlyLegend" class="legend" style="margin-bottom:0;"></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="mview-group" id="monthlyQuickActions" style="display:none;">
+            <button type="button" class="mview-btn" data-mquick="top5" data-i18n="btn_quick_top5">Top 5</button>
+            <button type="button" class="mview-btn" data-mquick="all" data-i18n="btn_quick_all">Show all</button>
+          </div>
+          <div class="mview-group" id="monthlyViewToggle">
+            <span class="mview-label" data-i18n="lbl_view">View:</span>
+            <button type="button" class="mview-btn active" data-mview="stacked" data-i18n="btn_view_stacked">By month</button>
+            <button type="button" class="mview-btn" data-mview="trend" data-i18n="btn_view_trend">Category trend</button>
+          </div>
+        </div>
+      </div>
+      <div class="mview-hint" id="monthlyChartHint"></div>
       <div style="position:relative;height:260px;">
-        <canvas id="monthlyChart" role="img" aria-label="Monthly stacked bar chart by category"></canvas>
+        <canvas id="monthlyChart" role="img" aria-label="Monthly stacked bar chart by category, toggleable to a per-category trend line view"></canvas>
       </div>
       <div id="monthlyPanel" style="display:none;border-top:1px solid var(--paper3);margin-top:4px;">
         <div class="txn-panel-toolbar" style="padding:12px 4px 10px;">
@@ -1523,6 +1596,13 @@ const I18N = {
   sec_review:          { en: 'Areas to Review',            zh: '需要关注' },
   lbl_withdrawals:     { en: 'Withdrawals by month',       zh: '按月支出' },
   lbl_trend:           { en: 'Trend',                      zh: '趋势' },
+  lbl_view:            { en: 'View:',                      zh: '视图：' },
+  btn_view_stacked:    { en: 'By month',                   zh: '按月' },
+  btn_view_trend:      { en: 'Category trend',             zh: '类别趋势' },
+  btn_quick_top5:      { en: 'Top 5',                       zh: '前 5 项' },
+  btn_quick_all:       { en: 'Show all',                    zh: '显示全部' },
+  hint_monthly_trend:  { en: 'Showing {n} of {total} categories \u2014 click a category above to add or remove it, or hover a line to isolate it.', zh: '正在显示 {total} 个类别中的 {n} 个——点击上方类别可添加或移除，悬停线条可单独查看。' },
+  desc_monthly_trend:  { en: 'Each line traces one category\u2019s spend across months \u2014 use it to spot which categories are rising, falling, or spiking.', zh: '每条线代表一个类别在各月的支出走势——可用于发现哪些类别在上升、下降或出现峰值。' },
   title_seasonal:      { en: 'Seasonal spending pattern',  zh: '季节性支出模式' },
   desc_seasonal:       { en: 'Spending climbs from mid-2025 through a pronounced Oct–Dec 2025 holiday peak, dips in Jan and Mar 2026, then surges again in Feb 2026 (large bills). Spending normalises to ~$2,400–$3,400/month outside peak periods.',
                           zh: '支出从 2025 年年中开始攀升，在 2025 年 10 月至 12 月的假期高峰期达到显著峰值，随后在 2026 年 1 月和 3 月回落，并在 2026 年 2 月（大额账单）再次飙升。在高峰期以外，月支出通常在约 $2,400–$3,400 之间。' },
@@ -1835,6 +1915,231 @@ function rebuildDashboard(months, spend, cats, merchants, txns, totalSpend, tota
 // ── Category table → collapsible side panel (with sorting) ─────────
 const GRID_COLOR = '#ede9e0';
 const TICK_COLOR = '#8a8680';
+
+// ── Monthly chart: shared renderer for "stacked by month" / "category trend" views ──
+window._monthlyViewMode = window._monthlyViewMode || 'stacked';
+window._monthlyHiddenCats = window._monthlyHiddenCats || null; // Set of category names hidden in trend view
+const MONTHLY_TREND_AUTO_LIMIT = 5; // when more categories than this, only the top N show by default
+function moneyTick(v) {
+  if (v < 1000) return '$' + v.toLocaleString();
+  const k = Math.round(v / 100) / 10;
+  return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k';
+}
+function defaultHiddenCatSet(activeCats) {
+  if (activeCats.length <= MONTHLY_TREND_AUTO_LIMIT) return new Set();
+  const sorted = [...activeCats].sort((a, b) => b.val - a.val);
+  return new Set(sorted.slice(MONTHLY_TREND_AUTO_LIMIT).map(c => c.name));
+}
+window._renderMonthlyCore = function(months, cats, monthlyByCat, mode) {
+  const canvas = document.getElementById('monthlyChart');
+  if (!canvas || !months.length || !cats.length) return;
+  mode = mode || window._monthlyViewMode || 'stacked';
+  window._monthlyViewMode = mode;
+  window._monthlyChartData = { months, cats, monthlyByCat };
+
+  if (window._monthlyChartInst) { try { window._monthlyChartInst.destroy(); } catch (e) {} }
+
+  const activeCats = cats
+    .filter(c => (monthlyByCat[c.name] || []).reduce((s, v) => s + v, 0) >= 1)
+    .map(c => ({ ...c, val: (monthlyByCat[c.name] || []).reduce((s, v) => s + v, 0) }));
+  const labels = months.map(fmtMonthKeyDisplay);
+
+  // Reset the hidden-category selection if the category set changed (new data) or we're not in trend mode
+  const sig = activeCats.map(c => c.name).sort().join('|');
+  if (window._monthlyHiddenCatsSig !== sig) {
+    window._monthlyHiddenCats = defaultHiddenCatSet(activeCats);
+    window._monthlyHiddenCatsSig = sig;
+  }
+  const quickActions = document.getElementById('monthlyQuickActions');
+  const hintEl = document.getElementById('monthlyChartHint');
+
+  // ── Legend ───────────────────────────────────────────────────
+  const legendEl = document.getElementById('monthlyLegend');
+  if (legendEl) {
+    legendEl.innerHTML = '';
+    activeCats.forEach(c => {
+      const hidden = mode === 'trend' && window._monthlyHiddenCats.has(c.name);
+      const item = document.createElement('div');
+      item.className = 'legend-item' + (mode === 'trend' ? ' legend-item--trend' : '');
+      item.dataset.cat = c.name;
+      if (hidden) item.classList.add('legend-item--off');
+      item.innerHTML = '<span class="legend-dot" style="background:' + c.color + ';width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0"></span>' + catName(c.name);
+      legendEl.appendChild(item);
+
+      if (mode === 'trend') {
+        item.addEventListener('click', () => {
+          const chart = window._monthlyChartInst;
+          if (!chart) return;
+          const idx = chart.data.datasets.findIndex(ds => ds._catName === c.name);
+          if (idx === -1) return;
+          const nowHidden = !chart.isDatasetVisible(idx);
+          if (nowHidden) { chart.show(idx); window._monthlyHiddenCats.delete(c.name); }
+          else { chart.hide(idx); window._monthlyHiddenCats.add(c.name); }
+          item.classList.toggle('legend-item--off', !chart.isDatasetVisible(idx));
+        });
+        item.addEventListener('mouseenter', () => {
+          const chart = window._monthlyChartInst;
+          if (!chart) return;
+          chart.data.datasets.forEach((ds, i) => {
+            const isTarget = ds._catName === c.name;
+            ds.borderColor = isTarget ? ds._origColor : ds._origColor + '33';
+            ds.pointBackgroundColor = isTarget ? ds._origColor : ds._origColor + '33';
+            ds.borderWidth = isTarget ? 3 : 1.5;
+          });
+          chart.update('none');
+        });
+        item.addEventListener('mouseleave', () => {
+          const chart = window._monthlyChartInst;
+          if (!chart) return;
+          chart.data.datasets.forEach(ds => {
+            ds.borderColor = ds._origColor;
+            ds.pointBackgroundColor = ds._origColor;
+            ds.borderWidth = 2;
+          });
+          chart.update('none');
+        });
+      }
+    });
+  }
+
+  // Quick-action buttons + hint only make sense in trend mode
+  if (quickActions) quickActions.style.display = mode === 'trend' ? 'flex' : 'none';
+  if (hintEl) {
+    const visibleCount = activeCats.length - window._monthlyHiddenCats.size;
+    hintEl.style.display = (mode === 'trend' && activeCats.length > MONTHLY_TREND_AUTO_LIMIT) ? 'block' : 'none';
+    if (hintEl.style.display === 'block') {
+      hintEl.textContent = t('hint_monthly_trend', { n: visibleCount, total: activeCats.length });
+    }
+  }
+
+  // Description line
+  const descEl = document.getElementById('monthlyChartDesc');
+  if (descEl && descEl.dataset.auto !== 'false') {
+    descEl.textContent = mode === 'trend' ? t('desc_monthly_trend') : (descEl.dataset.stackedText || '');
+  }
+
+  let config;
+
+  if (mode === 'trend') {
+    config = {
+      type: 'line',
+      data: {
+        labels,
+        datasets: activeCats.map(c => {
+          const hidden = window._monthlyHiddenCats.has(c.name);
+          return {
+            label: catName(c.name),
+            _catName: c.name,
+            _origColor: c.color,
+            data: (monthlyByCat[c.name] || months.map(() => 0)).map(v => Math.round(v * 100) / 100),
+            borderColor: c.color,
+            backgroundColor: c.color,
+            fill: false,
+            tension: 0.35,
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: c.color,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1.5,
+            spanGaps: true,
+            hidden
+          };
+        })
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            mode: 'index', intersect: false,
+            callbacks: {
+              title: items => items[0].label,
+              label: c => { const v = c.parsed.y; if (v === null || v === undefined) return null; return '  ' + c.dataset.label + ': $' + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
+              footer: items => 'Total: $' + items.reduce((s, i) => s + (i.parsed.y || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 11, family: 'DM Mono' }, color: TICK_COLOR } },
+          y: { grid: { color: GRID_COLOR }, border: { display: false }, beginAtZero: true, ticks: { callback: moneyTick, font: { size: 11, family: 'DM Mono' }, color: TICK_COLOR } }
+        },
+        onClick(e, elements, chart) {
+          const pts = chart.getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+          if (pts.length && typeof window._openMonthPanel === 'function') window._openMonthPanel(months[pts[0].index]);
+        },
+        onHover(e, elements) { e.native.target.style.cursor = elements.length ? 'pointer' : 'default'; }
+      }
+    };
+  } else {
+    config = {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: activeCats.map(c => ({
+          label: catName(c.name),
+          data: (monthlyByCat[c.name] || months.map(() => 0)).map(v => Math.round(v * 100) / 100),
+          backgroundColor: c.color,
+          borderWidth: 0,
+          stack: 'monthly'
+        }))
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            mode: 'index', intersect: false,
+            callbacks: {
+              title: items => items[0].label,
+              label: c => { const v = c.parsed.y; if (!v || v < 0.01) return null; return '  ' + c.dataset.label + ': $' + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); },
+              footer: items => 'Total: $' + items.reduce((s, i) => s + (i.parsed.y || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            }
+          }
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, family: 'DM Mono' }, color: TICK_COLOR } },
+          y: { stacked: true, grid: { color: GRID_COLOR }, border: { display: false }, ticks: { callback: moneyTick, font: { size: 11, family: 'DM Mono' }, color: TICK_COLOR } }
+        },
+        onClick(e, elements) { if (elements.length && typeof window._openMonthPanel === 'function') window._openMonthPanel(months[elements[0].index]); },
+        onHover(e, elements) { e.native.target.style.cursor = elements.length ? 'pointer' : 'default'; }
+      }
+    };
+  }
+
+  window._monthlyChartInst = new Chart(canvas, config);
+};
+
+// Wire up the view-toggle buttons and the top-5 / show-all quick actions once
+(function wireMonthlyViewToggle() {
+  const group = document.getElementById('monthlyViewToggle');
+  const quickActions = document.getElementById('monthlyQuickActions');
+  if (group) {
+    group.querySelectorAll('.mview-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mview;
+        group.querySelectorAll('.mview-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const d = window._monthlyChartData;
+        if (d) window._renderMonthlyCore(d.months, d.cats, d.monthlyByCat, mode);
+        else window._monthlyViewMode = mode;
+      });
+    });
+  }
+  if (quickActions) {
+    quickActions.querySelectorAll('.mview-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const d = window._monthlyChartData;
+        if (!d) return;
+        const activeCats = d.cats.filter(c => (d.monthlyByCat[c.name] || []).reduce((s, v) => s + v, 0) >= 1);
+        if (btn.dataset.mquick === 'top5') window._monthlyHiddenCats = defaultHiddenCatSet(activeCats);
+        else window._monthlyHiddenCats = new Set();
+        window._renderMonthlyCore(d.months, d.cats, d.monthlyByCat, 'trend');
+      });
+    });
+  }
+})();
 const catTotal      = CATS.length ? CATS.reduce((a,c) => a+c.val, 0) : 0;
 const catBody       = document.getElementById('catTableBody');
 const catFoot       = document.getElementById('catTableFoot');
@@ -2127,7 +2432,7 @@ function updateMetrics() {
     const peakIdx = wSpend.indexOf(Math.max(...wSpend));
     const peakMon = (window.MONTHS || [])[peakIdx] || '';
     if (el('monthlyChartTitle')) el('monthlyChartTitle').textContent = peakMon ? peakMon + ' ' + t('word_peak_month') : t('title_monthly_default');
-    if (el('monthlyChartDesc'))  el('monthlyChartDesc').textContent  = '';
+    if (el('monthlyChartDesc'))  el('monthlyChartDesc').textContent  = (window._monthlyViewMode === 'trend') ? t('desc_monthly_trend') : '';
   }
   if (window.CATS && window.CATS.length) {
     const top2 = window.CATS.slice(0,2).map(c => catName(c.name).split(' ')[0]).join(' & ');
@@ -2346,51 +2651,7 @@ function updateMetrics() {
     else if (monthlyByCat['Other']) monthlyByCat['Other'][mi] += t.amt;
   });
 
-  const legendEl = document.getElementById('monthlyLegend');
-  catOrder.forEach(cat => {
-    const color = (CATS.find(c => c.name === cat) || {}).color || '#888';
-    const total = monthlyByCat[cat].reduce((s,v)=>s+v,0);
-    if (total < 1) return;
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.innerHTML = '<span class="legend-dot" style="background:' + color + ';width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0"></span>' + cat;
-    if (legendEl) legendEl.appendChild(item);
-  });
-
-  const datasets = catOrder
-    .filter(cat => monthlyByCat[cat].reduce((s,v)=>s+v,0) >= 1)
-    .map(cat => ({
-      label: cat,
-      data: monthlyByCat[cat].map(v => Math.round(v*100)/100),
-      backgroundColor: (CATS.find(c => c.name === cat)||{}).color || '#888',
-      borderWidth: 0,
-      stack: 'monthly'
-    }));
-
-  new Chart(document.getElementById('monthlyChart'), {
-    type: 'bar',
-    data: { labels: MONTHS.map(fmtMonthKeyDisplay), datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          mode: 'index',
-          callbacks: {
-            title: items => items[0].label,
-            label: c => { const v = c.parsed.y; if (!v || v < 0.01) return null; return '  ' + c.dataset.label + ': $' + v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); },
-            footer: items => 'Total: $' + items.reduce((s,i)=>s+(i.parsed.y||0),0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})
-          }
-        }
-      },
-      scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: TICK_COLOR } },
-        y: { stacked: true, grid: { color: GRID_COLOR }, border: { display: false }, ticks: { callback: v => { if (v < 1000) return '$' + v.toLocaleString(); const k = Math.round(v/100)/10; return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k'; }, font: { size: 11 }, color: TICK_COLOR } }
-      },
-      onClick(e, elements) { if (elements.length) openMonthPanel(MONTHS[elements[0].index]); },
-      onHover(e, elements) { e.native.target.style.cursor = elements.length ? 'pointer' : 'default'; }
-    }
-  });
+  window._renderMonthlyCore(MONTHS, CATS, monthlyByCat, window._monthlyViewMode);
 })();
 
 // ── Trend line chart ──────────────────────────────────────────────
@@ -3069,7 +3330,7 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
     const GRID_COLOR = '#ede9e0';
     const TICK_COLOR = '#8a8680';
 
-    // ── Stacked bar chart ───────────────────────────────────────
+    // ── Monthly chart (stacked-by-month or per-category trend) ───
     const barCtx = document.getElementById('monthlyChart');
     if (barCtx) {
       const catOrder = cats.map(c => c.name);
@@ -3081,59 +3342,10 @@ if (MERCHANTS.length) new Chart(document.getElementById('merchantChart'), {
         if (monthlyByCat[t.cat]) monthlyByCat[t.cat][mi] += t.amt;
         else if (monthlyByCat['Other']) monthlyByCat['Other'][mi] += t.amt;
       });
-
-      // ── Rebuild legend ────────────────────────────────────────
-      const legendEl = document.getElementById('monthlyLegend');
-      if (legendEl) {
-        legendEl.innerHTML = '';
-        cats.forEach(c => {
-          const total = (monthlyByCat[c.name] || []).reduce((s,v) => s+v, 0);
-          if (total < 1) return;
-          const item = document.createElement('div');
-          item.className = 'legend-item';
-          item.innerHTML = '<span class="legend-dot" style="background:' + c.color + ';width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;margin-right:6px"></span>' + catName(c.name);
-          legendEl.appendChild(item);
-        });
-      }
-      new Chart(barCtx, {
-        type: 'bar',
-        data: {
-          labels: months.map(fmtMonthKeyDisplay),
-          datasets: cats.map(c => ({
-            label: catName(c.name),
-            data: monthlyByCat[c.name] || months.map(()=>0),
-            backgroundColor: c.color,
-            borderWidth: 0,
-          }))
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              mode: 'index',
-              intersect: false,
-              callbacks: {
-                title: items => items[0].label,
-                label: c => { const v = c.parsed.y; if (!v || v < 0.01) return null; return '  ' + c.dataset.label + ': $' + v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); },
-                footer: items => 'Total: $' + items.reduce((s,i)=>s+(i.parsed.y||0),0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})
-              }
-            }
-          },
-          scales: {
-            x: { stacked: true, grid: { display: false }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 } } },
-            y: { stacked: true, grid: { color: GRID_COLOR }, ticks: { color: TICK_COLOR, font: { family: 'DM Mono', size: 10 }, callback: v => { if (v < 1000) return '$' + v.toLocaleString(); const k = Math.round(v/100)/10; return '$' + (Number.isInteger(k) ? k.toFixed(0) : k.toFixed(1)) + 'k'; } } }
-          },
-          onClick(e, elements) {
-            if (!elements.length) return;
-            const mi = elements[0].index;
-            if (typeof window._openMonthPanel === 'function') window._openMonthPanel(months[mi], mi);
-          },
-          onHover(e, elements) {
-            e.native.target.style.cursor = elements.length ? 'pointer' : 'default';
-          }
-        }
-      });
+      // window._monthlyChartInst was already destroyed above along with every
+      // other Chart.js instance; _renderMonthlyCore rebuilds it (and the legend)
+      // in whichever view (stacked / trend) the user last selected.
+      window._renderMonthlyCore(months, cats, monthlyByCat, window._monthlyViewMode);
     }
 
     // ── Trend line chart ────────────────────────────────────────
