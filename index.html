@@ -1698,6 +1698,7 @@ const I18N = {
   word_txn_short:       { en: 'txn',    zh: '笔交易' },
   word_total_short:     { en: 'total',  zh: '总计' },
   word_avg_short:       { en: 'avg',    zh: '平均' },
+  word_avg_month_short: { en: 'avg/mo', zh: '月均' },
   obs_top_cat_title:    { en: 'Top category: {cat}',            zh: '最大类别：{cat}' },
   obs_top_cat_body:     { en: '{cat} is your largest spending category at {amt}, representing {pct}% of total spend.', zh: '{cat}是您支出最多的类别，共 {amt}，占总支出的 {pct}%。' },
   obs_top_merchant_title:{ en: 'Top merchant: {name}',          zh: '主要商户：{name}' },
@@ -2299,10 +2300,12 @@ function populateCatPanel(c) {
   currentTxns    = txns;
   const txnTotal = txns.reduce((s,t) => s+t.amt, 0);
   const avg      = txns.length ? txnTotal/txns.length : 0;
+  const numMos   = (window.MONTHS || []).length || 1;
+  const avgMo    = txnTotal / numMos;
 
   panelCat.textContent   = catName(c.name);
   panelStats.textContent =
-    `${txns.length} ${txns.length !== 1 ? t('word_txns_short') : t('word_txn_short')} · $${txnTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ${t('word_total_short')} · ${t('word_avg_short')} $${avg.toFixed(2)}`;
+    `${txns.length} ${txns.length !== 1 ? t('word_txns_short') : t('word_txn_short')} · $${txnTotal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} ${t('word_total_short')} · ${t('word_avg_short')} $${avg.toFixed(2)} · ${t('word_avg_month_short')} $${avgMo.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
   panelSearch.value = '';
 
   renderTxnList(txns, '');
